@@ -1,0 +1,62 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!78 &1
+TagManager:
+  serializedVersion: 2
+  tags:
+  - Enemy
+  - RedCrystal
+  - BlueCrystal
+  - YellowCrystal
+  - GreenCrystal
+  - EnemyBullet
+  - PlayerBullet
+  - Ground
+  - CryPart
+  - AiRed
+  - AiYellow
+  - AiBlue
+  - AiGreen
+  - Laser
+  - Walls
+  - AOE
+  - Blue_Spear
+  - Yellow_Hammer
+  - Red_Arrow
+  layers:
+  - Default
+  - TransparentFX
+  - Ignore Raycast
+  - Player
+  - Water
+  - UI
+  - Crystals
+  - Enemy
+  - Ground
+  - CrystalParts
+  - Env
+  - Shield
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  - 
+  m_SortingLayers:
+  - name: Default
+    uniqueID: 0
+    locked: 0
