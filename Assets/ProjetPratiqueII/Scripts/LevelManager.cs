@@ -37,6 +37,8 @@ public class LevelManager : MonoBehaviour
     public int m_UnlockPrice;
     public int m_SpellsCost;
 
+    public bool playerGodmode;
+
     private static LevelManager levelManager;
 
     public static LevelManager instance
@@ -85,6 +87,7 @@ public class LevelManager : MonoBehaviour
         m_RedCollected = 0;
         m_YellowCollected = 0;
         m_BlueCollected = 0;
+        playerGodmode = false;
     }
 
     public GameObject SpawnObj(string _tag, Vector3 _position, Quaternion _rotation)

@@ -38,9 +38,11 @@ public class PlayerStateMachine : MonoBehaviour
     [SerializeField] public Vector3 m_HealthBarOffset;
     [SerializeField] public Canvas m_PlayerCanvas;
     [SerializeField] public GameObject m_AimSphere;
-    [SerializeField] public GameObject m_Shield;
 
-    [Space(10)] [Header("Attributes")] [Space(10)] [HideInInspector]
+    [Space(10)]
+    [Header("Attributes")]
+    [Space(10)]
+    [HideInInspector]
     public float m_RegenerateAmount;
 
     [SerializeField] public float m_MinRegenerateAmount;
@@ -57,17 +59,10 @@ public class PlayerStateMachine : MonoBehaviour
     public float m_RegenerateElapsed;
 
     [HideInInspector] public float m_YellowSpellElapsed;
-    [HideInInspector] public float m_ShieldElapsed;
     [HideInInspector] public float m_Hp;
 
     [SerializeField] public float m_RegenerateTimer;
     [SerializeField] public float m_YellowSpellTimer;
-    [SerializeField] public float m_ShieldTimer;
-
-    // HASED TAGS!!!! (get it? hastag -> # (#yoloswag))
-    public static readonly int Running = Animator.StringToHash("Running");
-    public static readonly int Attack = Animator.StringToHash("Attack");
-    public static readonly int MineAnim = Animator.StringToHash("MineAnim");
 
     // Camera / Rays / Interactions
     [HideInInspector] public Camera m_MainCamera;
@@ -96,6 +91,13 @@ public class PlayerStateMachine : MonoBehaviour
     [HideInInspector] public Quaternion m_BulletRotation;
 
     [Space]
+    [Header("Blue Spell")]
+    [Space] //
+    [SerializeField] private GameObject m_BlueBall;
+    [SerializeField] private float m_BlueBallSpeed;
+    [SerializeField] private float m_BlueBallTime;
+
+    [Space]
     [Header("Cursor")]
     [Space] //
     [HideInInspector]
@@ -104,6 +106,21 @@ public class PlayerStateMachine : MonoBehaviour
     [SerializeField] public Texture2D m_MineCursor;
     [SerializeField] public Texture2D m_AttackCursor;
 
+    private bool m_YellowSpellActive;
+
+    struct CrystalWave
+    {
+        public int wave;
+        public GameObject crystal;
+        public HashSet<GameObject> next;
+
+        public CrystalWave(int wave, GameObject crystal)
+        {
+            this.wave = wave;
+            this.crystal = crystal;
+            this.next = new HashSet<GameObject>();
+        }
+    }
     void Start()
     {
         Init();
@@ -115,8 +132,6 @@ public class PlayerStateMachine : MonoBehaviour
         spellsCost = LevelManager.instance.m_SpellsCost;
         unlockPrice = LevelManager.instance.m_UnlockPrice;
         m_AimSphere.SetActive(false);
-        m_Shield.SetActive(false);
-        m_ShieldElapsed = m_ShieldTimer;
         m_AimingBlue = false;
         m_AimingRed = false;
         m_Mining = false;
@@ -137,6 +152,7 @@ public class PlayerStateMachine : MonoBehaviour
         m_RegenerateElapsed = 0;
         m_OutlinedGameObject = null;
         UpdateHealthBar();
+        m_YellowSpellActive = false;
 
         SetState(new PlayerIdle(this));
     }
@@ -267,14 +283,18 @@ public class PlayerStateMachine : MonoBehaviour
 
     public void TakeDmg(float damage)
     {
-        m_Hp -= damage;
-        if (m_Hp <= 0)
+        if (!LevelManager.instance.playerGodmode)
         {
-            Death();
-        }
 
-        UpdateHealthBar();
-        m_RegenerateElapsed = m_RegenerateTimer;
+            m_Hp -= damage;
+            if (m_Hp <= 0)
+            {
+                Death();
+            }
+
+            UpdateHealthBar();
+            m_RegenerateElapsed = m_RegenerateTimer;
+        }
     }
 
     private void Death()
@@ -422,6 +442,8 @@ public class PlayerStateMachine : MonoBehaviour
             case "Yellow":
                 m_YellowSpell = true;
                 LevelManager.instance.CollectAction?.Invoke(-unlockPrice, "Yellow");
+                LevelManager.instance.SetPlayerDamage(m_MaxDamage);
+
                 break;
             case "Red":
                 m_RedSpell = true;
@@ -436,9 +458,8 @@ public class PlayerStateMachine : MonoBehaviour
         LevelManager.instance.SpellCastAction?.Invoke("Blue");
         LevelManager.instance.SetSpellAvailable("Blue", false);
 
-        HashSet<GameObject> wavesAll = new HashSet<GameObject>();
-        HashSet<GameObject> waveOne = new HashSet<GameObject>();
-        HashSet<GameObject> waveTwo = new HashSet<GameObject>();
+        HashSet<CrystalWave> wavesAll = new HashSet<CrystalWave>();
+
         float CrystalSpacing = LevelManager.instance.m_CrystalSpaceBetween;
         float crystalHeight = _crystal.transform.position.y;
 
@@ -450,7 +471,8 @@ public class PlayerStateMachine : MonoBehaviour
             new Vector2(-CrystalSpacing, -CrystalSpacing)
         };
 
-        wavesAll.Add(_crystal);
+        CrystalWave currentCW = new CrystalWave(1, _crystal);
+        wavesAll.Add(currentCW);
         Ray blueRay = new Ray();
         RaycastHit blueHit = new RaycastHit();
         foreach (var pos in surroundOffsets)
@@ -464,29 +486,34 @@ public class PlayerStateMachine : MonoBehaviour
             {
                 if (blueHit.collider.gameObject.layer == 6)
                 {
-                    waveOne.Add(blueHit.collider.gameObject);
-                    wavesAll.Add(blueHit.collider.gameObject);
+                    GameObject curentCrystal = blueHit.collider.gameObject;
+                    currentCW.next.Add(curentCrystal);
+                    wavesAll.Add(new CrystalWave(currentCW.wave + 1, curentCrystal));
                 }
             }
         }
 
-        
 
-        foreach (var crystal in waveOne)
+
+        foreach (var crystal in wavesAll)
         {
-            foreach (var pos in surroundOffsets)
+            if (crystal.wave == 2)
             {
-                Vector2 crystalPos = new Vector2(crystal.transform.position.x, crystal.transform.position.z);
-                Vector2 currentPosition = pos + crystalPos;
-
-                blueRay.origin = new Vector3(currentPosition.x, crystalHeight + 2.0f, currentPosition.y);
-                blueRay.direction = Vector3.down;
-                if (Physics.Raycast(blueRay, out blueHit, Mathf.Infinity))
+                foreach (var pos in surroundOffsets)
                 {
-                    if (blueHit.collider.gameObject.layer == 6)
+                    Vector2 crystalPos = new Vector2(crystal.crystal.transform.position.x, crystal.crystal.transform.position.z);
+                    Vector2 currentPosition = pos + crystalPos;
+
+                    blueRay.origin = new Vector3(currentPosition.x, crystalHeight + 2.0f, currentPosition.y);
+                    blueRay.direction = Vector3.down;
+                    if (Physics.Raycast(blueRay, out blueHit, Mathf.Infinity))
                     {
-                        waveTwo.Add(blueHit.collider.gameObject);
-                        wavesAll.Add(blueHit.collider.gameObject);
+                        if (blueHit.collider.gameObject.layer == 6)
+                        {
+                            GameObject curentCrystal = blueHit.collider.gameObject;
+                            crystal.next.Add(curentCrystal);
+                            wavesAll.Add(new CrystalWave(3, curentCrystal));
+                        }
                     }
                 }
             }
@@ -495,7 +522,11 @@ public class PlayerStateMachine : MonoBehaviour
 
         foreach (var crystal in wavesAll)
         {
-            crystal.GetComponent<CrystalEvents>().GetMined();
+            if (crystal.wave == 1)
+            {
+                
+            }
+            //crystal.GetComponent<CrystalEvents>().GetMined();
         }
     }
 
@@ -510,6 +541,7 @@ public class PlayerStateMachine : MonoBehaviour
     private void YellowSpell()
     {
         m_YellowSpellElapsed = 0.0f;
+        m_YellowSpellActive = true;
         LevelManager.instance.CollectAction?.Invoke(-spellsCost, "Yellow");
         LevelManager.instance.SetSpellAvailable("Yellow", false);
         LevelManager.instance.ActiveAction("Yellow", true);
@@ -548,28 +580,17 @@ public class PlayerStateMachine : MonoBehaviour
             }
         }
 
-        // ============
-        // if (m_ShieldElapsed < m_ShieldTimer)
-        // {
-        //     m_Shield.transform.position = transform.position + new Vector3(0, 0.5f, 0);
-        //     m_ShieldElapsed += Time.deltaTime;
-        // }
-        // else if (m_Shield.activeSelf)
-        // {
-        //     m_Shield.SetActive(false);
-        //     LevelManager.instance.SpellCastAction?.Invoke("Blue");
-        // }
-        // ============
-        if (m_YellowSpellElapsed < m_YellowSpellTimer)
+        if (m_YellowSpellActive)
         {
             LevelManager.instance.SetPlayerDamage(100);
             m_YellowSpellElapsed += Time.deltaTime;
-        }
-        else if (LevelManager.instance.playerDamage == 100)
-        {
-            LevelManager.instance.SetPlayerDamage(m_MaxDamage);
-            LevelManager.instance.SpellCastAction?.Invoke("Yellow");
-            LevelManager.instance.ActiveAction?.Invoke("Yellow", false);
+            if (m_YellowSpellElapsed > m_YellowSpellTimer)
+            {
+                LevelManager.instance.SetPlayerDamage(m_MaxDamage);
+                m_YellowSpellActive = false;
+                LevelManager.instance.ActiveAction?.Invoke("Yellow", false);
+                LevelManager.instance.SpellCastAction?.Invoke("Yellow");
+            }
         }
 
         if (m_AimingRed)
@@ -623,6 +644,8 @@ public class PlayerStateMachine : MonoBehaviour
                 "Boss room has been opened but cannot be accessed for the moment.");
         }
     }
+
+
 
     private void ToggleEnableOutline(bool _state)
     {

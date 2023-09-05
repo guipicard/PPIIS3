@@ -114,7 +114,11 @@ public class CheatManager : MonoBehaviour
             godMode = GUILayout.Toggle(godMode, "Heal");
             if (godMode)
             {
-                Player.GetComponent<PlayerStateMachine>().Heal(100);
+                LevelManager.instance.playerGodmode = true;
+            }
+            else
+            {
+                LevelManager.instance.playerGodmode = false;
             }
 
             if (GUILayout.Button("Heal"))
@@ -125,11 +129,11 @@ public class CheatManager : MonoBehaviour
             maxDamage = GUILayout.Toggle(maxDamage, "One Shot Ennemies");
             if (maxDamage)
             {
-                LevelManager.instance.SetPlayerDamage(100.0f);
+                LevelManager.instance.SetPlayerDamage(100);
             }
             else
             {
-                LevelManager.instance.SetPlayerDamage(20.0f);
+                LevelManager.instance.SetPlayerDamage(Player.GetComponent<PlayerStateMachine>().m_MaxDamage);
             }
 
             if (GUILayout.Button("Give Crystals"))

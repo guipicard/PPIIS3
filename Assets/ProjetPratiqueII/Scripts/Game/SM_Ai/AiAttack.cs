@@ -35,7 +35,6 @@ public class AiAttack : AiState
         m_Elapsed = 0.0f;
         m_Shot = false;
         m_Launched = false;
-        m_CooldownElapsed = 0.0f;
     }
 
     public override void UpdateExecute()
@@ -97,7 +96,6 @@ public class AiAttack : AiState
 
         if (m_Elapsed > 0.32f)
         {
-            m_CooldownElapsed = 0.0f;
             _AiStateMachine.SetState(new AiDenfending(_AiStateMachine));
         }
     }
@@ -238,7 +236,6 @@ public class AiAttack : AiState
                 }
                 if (m_Elapsed > 0.3f)
                 {
-                    m_CooldownElapsed = 0.0f;
                     _AiStateMachine.SetState(new AiDenfending(_AiStateMachine));
                 }
                 break;
@@ -257,7 +254,6 @@ public class AiAttack : AiState
                 }
                 if (m_Elapsed > 0.3f)
                 {
-                    m_CooldownElapsed = 0.0f;
                     _AiStateMachine.SetState(new AiDenfending(_AiStateMachine));
                 }
                 break;

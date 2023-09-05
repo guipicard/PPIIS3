@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditorInternal;
 using UnityEngine;
 
 public class AiMoving : AiState
@@ -19,6 +20,7 @@ public class AiMoving : AiState
 
     public override void UpdateExecute()
     {
+        _AiStateMachine.IncrementCD();
         Vector3 playerPosition = player.transform.position;
         m_PlayerDistance = Vector3.Distance(playerPosition, m_Transform.position);
         m_Transform.LookAt(playerPosition);

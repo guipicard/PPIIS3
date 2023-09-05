@@ -14,7 +14,6 @@ public class AiIdle : AiState
 
     public override void UpdateExecute()
     {
-        m_CooldownElapsed += Time.deltaTime;
         m_PlayerDistance = Vector3.Distance(player.transform.position, m_Transform.position);
         if (m_PlayerDistance < m_TriggerDistance)
         {

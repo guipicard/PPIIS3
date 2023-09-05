@@ -111,7 +111,6 @@ public abstract class PlayerState
         m_HealthBar = _stateMachine.m_HealthBar;
         m_HealthBarOffset = _stateMachine.m_HealthBarOffset;
         m_AimSphere = _stateMachine.m_AimSphere;
-        m_Shield = _stateMachine.m_Shield;
         m_MinRegenerateAmount = _stateMachine.m_MinRegenerateAmount;
         m_MaxRegenerateAmount = _stateMachine.m_MaxRegenerateAmount;
         m_MinHealth = _stateMachine.m_MinHealth;
@@ -121,7 +120,6 @@ public abstract class PlayerState
         m_RedSpellDamage = _stateMachine.m_RedSpellDamage;
         m_RegenerateTimer = _stateMachine.m_RegenerateTimer;
         m_YellowSpellTimer = _stateMachine.m_YellowSpellTimer;
-        m_ShieldTimer = _stateMachine.m_ShieldTimer;
         m_AimOffset = _stateMachine.m_AimOffset;
         m_MineCursor = _stateMachine.m_MineCursor;
         m_AttackCursor = _stateMachine.m_AttackCursor;
@@ -148,7 +146,6 @@ public abstract class PlayerState
     m_RegenerateElapsed = _stateMachine.m_RegenerateElapsed;
 
     m_YellowSpellElapsed = _stateMachine.m_YellowSpellElapsed;
-    m_ShieldElapsed = _stateMachine.m_ShieldElapsed;
     m_Hp = _stateMachine.m_Hp;
     
     m_MainCamera = _stateMachine.m_MainCamera;

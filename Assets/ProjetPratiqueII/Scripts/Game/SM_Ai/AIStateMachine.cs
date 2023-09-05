@@ -74,12 +74,16 @@ public class AIStateMachine : MonoBehaviour
     
     void Update()
     {
-        Debug.Log(m_CooldownElapsed);
+        //Debug.Log(m_CooldownElapsed);
         _currentState.UpdateExecute();
     }
 
     private void FixedUpdate()
     {
+        if (m_CooldownElapsed > m_Cooldown)
+        {
+            _currentState = new AiAttack(this);
+        }
         _currentState.FixedUpdateExecute();
         m_AiCanvas.transform.LookAt(m_MainCamera.transform.position);
     }
@@ -122,5 +126,15 @@ public class AIStateMachine : MonoBehaviour
     public bool IsDead()
     {
         return m_Dead;
+    }
+
+    public void IncrementCD()
+    {
+        m_CooldownElapsed += Time.deltaTime;
+        if (m_CooldownElapsed > m_Cooldown)
+        {
+            _currentState = new AiAttack(this);
+            m_CooldownElapsed = 0.0f;
+        }
     }
 }

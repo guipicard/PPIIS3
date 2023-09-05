@@ -31,7 +31,6 @@ public abstract class AiState
     protected float m_PlayerDistance;
     private bool m_IsStabbing;
     private bool m_OutOfRange;
-    protected float m_CooldownElapsed;
     private Outline m_OutlineScript;
     
     protected static readonly int running = Animator.StringToHash("Running");
@@ -87,7 +86,6 @@ public abstract class AiState
         m_PlayerDistance = _stateMachine.m_PlayerDistance;
         m_IsStabbing = _stateMachine.m_IsStabbing;
         m_OutOfRange = _stateMachine.m_OutOfRange;
-        m_CooldownElapsed = _stateMachine.m_CooldownElapsed;
         m_OutlineScript = _stateMachine.m_OutlineScript;
     }
 }
