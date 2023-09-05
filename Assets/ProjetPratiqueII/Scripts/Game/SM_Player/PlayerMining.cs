@@ -30,7 +30,7 @@ public class PlayerMining : PlayerState
     
     private void MineCrystal()
     {
-        if (m_TargetCrystal != null)
+        if (m_TargetCrystal.activeSelf)
         {
             m_TargetCrystal.GetComponent<CrystalEvents>().GetMined();
             m_TargetCrystal = null;

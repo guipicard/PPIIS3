@@ -25,6 +25,7 @@ public class LevelManager : MonoBehaviour
     public Action<string> ErrorAction;
     public Action<float> RedSpellAction;
     public Action<string> SpellCastAction;
+    public Action<string, bool> ActiveAction;
 
     private bool m_BlueSpellAvailable;
     private bool m_YellowSpellAvailable;

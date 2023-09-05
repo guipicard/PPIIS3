@@ -7,6 +7,9 @@ using Random = UnityEngine.Random;
 public class PlayerBullet : MonoBehaviour
 {
     [SerializeField] private float m_Speed;
+    [SerializeField] private float m_StepTwoTime;
+
+    private float m_Elapsed;
 
     private GameObject m_Target;
 
@@ -34,12 +37,14 @@ public class PlayerBullet : MonoBehaviour
 
     private void OnEnable()
     {
+        m_Elapsed = 0.0f;
         targetAlive = true;
         transform.GetChild(0).GetComponent<TrailRenderer>().Clear();
     }
 
     void Update()
     {
+        m_Elapsed += Time.deltaTime;
         Vector3 currentPos = transform.position;
         if (targetAlive) currentTargetPos = m_Target.transform.position + m_HeightOffset;
         m_InitialDistance = Vector3.Distance(m_InitialPosition, currentTargetPos);
@@ -59,12 +64,29 @@ public class PlayerBullet : MonoBehaviour
         t = Mathf.Abs(t - 1);
         if (t > 1.0f) t = 1.0f;
         if (t < 0.0f) t = 0.0f;
-
-        float maxSpeed = t > 0.3f ? m_Speed * 1.5f : m_Speed;
-        m_Rigidbody.velocity = Vector3.Lerp(m_InitialTargetVelocity * maxSpeed, newVelocity * maxSpeed, t);
+        float maxSpeed = 0.0f;
+        if (m_Elapsed > m_StepTwoTime)
+        {
+            maxSpeed = m_Speed * 5.0f;
+            m_Rigidbody.velocity = newVelocity * maxSpeed;
+        }
+        else
+        {
+            maxSpeed = m_Speed;
+            m_Rigidbody.velocity = Vector3.Lerp(m_InitialTargetVelocity * maxSpeed, newVelocity * maxSpeed, t);
+        }
 
         transform.LookAt(currentTargetPos);
 
+        if (targetAlive)
+        {
+            AIStateMachine aiSM = m_Target.GetComponent<AIStateMachine>();
+            if (aiSM.IsDead())
+            {
+                m_Target = null;
+                targetAlive = false;
+            }
+        }
         if (Vector3.Distance(currentPos, currentTargetPos) <= 0.2f)
         {
             if (targetAlive)
@@ -92,7 +114,7 @@ public class PlayerBullet : MonoBehaviour
             m_InitialDistance = Mathf.Abs(Vector3.Distance(_pos, targetPos));
             float x = Random.Range(-45, 45);
             float y = 45 - Mathf.Abs(x);
-            m_InitialTargetVelocity = (targetPos - _pos).normalized + (new Vector3(x, y, 0).normalized);
+            m_InitialTargetVelocity = (targetPos - _pos + new Vector3(x, y, 0)).normalized;
         }
     }
 }

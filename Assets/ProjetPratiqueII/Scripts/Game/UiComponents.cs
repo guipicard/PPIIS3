@@ -33,6 +33,8 @@ public class UiComponents : MonoBehaviour
     [SerializeField] private Image m_YellowCrystalImage;
     [SerializeField] private Image m_BlueCrystalImage;
 
+    [SerializeField] private float m_ActiveHeight;
+
     [SerializeField] private TextMeshProUGUI m_ErrorText;
     private float m_ErrorElapsed;
 
@@ -57,6 +59,7 @@ public class UiComponents : MonoBehaviour
         LevelManager.instance.ErrorAction += ShowErrorMessage;
         LevelManager.instance.CollectAction += UpdateUi;
         LevelManager.instance.SpellCastAction += TriggerSpell;
+        LevelManager.instance.ActiveAction += ActivateSpell;
 
         ChangeAlpha(m_BlueCrystalImage, 0.2f);
         ChangeAlpha(m_GreenCrystalImage, 0.2f);
@@ -158,6 +161,7 @@ public class UiComponents : MonoBehaviour
                     ChangeAlpha(m_BlueCrystalImage, 0.2f);
                     LevelManager.instance.SetSpellAvailable("Blue", false);
                 }
+
                 break;
             case "Yellow":
                 m_YellowCrystalsText.text = crystalAmount.ToString();
@@ -172,6 +176,7 @@ public class UiComponents : MonoBehaviour
                     ChangeAlpha(m_YellowCrystalImage, 0.2f);
                     LevelManager.instance.SetSpellAvailable("Yellow", false);
                 }
+
                 break;
             case "Green":
                 m_GreenCrystalsText.text = crystalAmount.ToString();
@@ -186,14 +191,15 @@ public class UiComponents : MonoBehaviour
                     ChangeAlpha(m_GreenCrystalImage, 0.2f);
                     LevelManager.instance.SetSpellAvailable("Green", false);
                 }
+
                 break;
             case "Red":
                 m_RedCrystalsText.text = crystalAmount.ToString();
                 if (crystalAmount >= RedPrice)
                 {
                     ChangeAlpha(m_RedCrystalImage, 1.0f);
-                     if (RedPrice == unlockPrice) RedPrice = spellsCost;
-                     LevelManager.instance.SetSpellAvailable("Red", true);
+                    if (RedPrice == unlockPrice) RedPrice = spellsCost;
+                    LevelManager.instance.SetSpellAvailable("Red", true);
                 }
                 else
                 {
@@ -233,6 +239,30 @@ public class UiComponents : MonoBehaviour
                 m_RedSpellElapsed = m_RedSpellTimer;
                 break;
         }
+    }
+
+    private void ActivateSpell(string _color, bool _state)
+    {
+        Image img = m_BlueCrystalImage;
+        switch (_color)
+        {
+            case "Blue":
+                img = m_BlueCrystalImage;
+                break;
+            case "Green":
+                img = m_GreenCrystalImage;
+                break;
+            case "Yellow":
+                img = m_YellowCrystalImage;
+                break;
+            case "Red":
+                img = m_RedCrystalImage;
+                break;
+        }
+
+        Vector2 m_rect = img.rectTransform.anchoredPosition;
+        m_rect.y += _state ? m_ActiveHeight : -m_ActiveHeight;
+        img.rectTransform.anchoredPosition = m_rect;
     }
 
     public void PauseToggle()

@@ -88,7 +88,8 @@ public class PlayerStateMachine : MonoBehaviour
     [HideInInspector] public bool m_YellowSpell;
     [HideInInspector] public bool m_GreenSpell;
     [HideInInspector] public bool m_RedSpell;
-    [HideInInspector] public bool m_Aiming;
+    [HideInInspector] public bool m_AimingRed;
+    [HideInInspector] public bool m_AimingBlue;
     [SerializeField] public Vector3 m_AimOffset;
     [HideInInspector] public int spellsCost;
     [HideInInspector] public int unlockPrice;
@@ -116,7 +117,8 @@ public class PlayerStateMachine : MonoBehaviour
         m_AimSphere.SetActive(false);
         m_Shield.SetActive(false);
         m_ShieldElapsed = m_ShieldTimer;
-        m_Aiming = false;
+        m_AimingBlue = false;
+        m_AimingRed = false;
         m_Mining = false;
         m_BlueSpell = false;
         m_YellowSpell = false;
@@ -159,13 +161,7 @@ public class PlayerStateMachine : MonoBehaviour
     private void FixedUpdate()
     {
         m_Transform = transform;
-        Vector3 currentPos = m_Transform.position;
-
         _currentState.FixedUpdateExecute();
-
-        // Health bar follow
-        // m_PlayerCanvas.transform.position = transform.position + m_HealthBarOffset;
-        // m_PlayerCanvas.transform.LookAt(m_MainCamera.transform.position);
     }
 
     private void SetInteraction()
@@ -181,7 +177,8 @@ public class PlayerStateMachine : MonoBehaviour
                 SetState(new PlayerMoving(this));
             }
         }
-        else if (Input.GetKeyDown(KeyCode.Q)) // AUTO ATTACK
+
+        if (Input.GetKeyDown(KeyCode.Q)) // AUTO ATTACK
         {
             if (Physics.Raycast(m_TargetRay, out m_TargetHit))
             {
@@ -228,7 +225,7 @@ public class PlayerStateMachine : MonoBehaviour
             {
                 if (m_OutlinedGameObject != null)
                 {
-                    if (m_OutlinedGameObject != m_TargetHit.collider.gameObject || m_Aiming)
+                    if (m_OutlinedGameObject != m_TargetHit.collider.gameObject || m_AimingRed)
                     {
                         m_OutlinedGameObject.GetComponent<Outline>().enabled = false;
                         m_OutlinedGameObject = null;
@@ -247,9 +244,10 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void LaunchBasicAttack()
     {
-        GameObject bullet = LevelManager.instance.SpawnObj("Player_Bullet", m_BulletSpawner.position,
-            m_BulletSpawner.transform.rotation);
-        bullet.GetComponent<PlayerBullet>().SetTarget(m_TargetEnemy, m_BulletSpawner.transform.position);
+        Vector3 bsPos = m_BulletSpawner.position;
+        Quaternion bsRotation = m_BulletSpawner.rotation;
+        GameObject bullet = LevelManager.instance.SpawnObj("Player_Bullet", bsPos, bsRotation);
+        bullet.GetComponent<PlayerBullet>().SetTarget(m_TargetEnemy, bsPos);
     }
 
     private void StartTime()
@@ -299,8 +297,8 @@ public class PlayerStateMachine : MonoBehaviour
             {
                 if (LevelManager.instance.GetSpellAvailable("Blue"))
                 {
-                    m_Shield.SetActive(true);
-                    BlueSpell();
+                    m_AimingBlue = !m_AimingBlue;
+                    LevelManager.instance.ActiveAction("Blue", m_AimingBlue);
                 }
                 else
                 {
@@ -381,8 +379,10 @@ public class PlayerStateMachine : MonoBehaviour
             {
                 if (LevelManager.instance.GetSpellAvailable("Red"))
                 {
-                    m_Aiming = true;
-                    m_AimSphere.SetActive(true);
+                    LevelManager.instance.RedSpellAction = null;
+                    m_AimingRed = !m_AimingRed;
+                    m_AimSphere.SetActive(m_AimingRed);
+                    LevelManager.instance.ActiveAction("Red", m_AimingRed);
                 }
                 else
                 {
@@ -430,11 +430,73 @@ public class PlayerStateMachine : MonoBehaviour
         }
     }
 
-    private void BlueSpell()
+    private void BlueSpell(GameObject _crystal)
     {
-        m_ShieldElapsed = 0;
         LevelManager.instance.CollectAction?.Invoke(-spellsCost, "Blue");
+        LevelManager.instance.SpellCastAction?.Invoke("Blue");
         LevelManager.instance.SetSpellAvailable("Blue", false);
+
+        HashSet<GameObject> wavesAll = new HashSet<GameObject>();
+        HashSet<GameObject> waveOne = new HashSet<GameObject>();
+        HashSet<GameObject> waveTwo = new HashSet<GameObject>();
+        float CrystalSpacing = LevelManager.instance.m_CrystalSpaceBetween;
+        float crystalHeight = _crystal.transform.position.y;
+
+        Vector2[] surroundOffsets = new Vector2[4]
+        {
+            new Vector2(CrystalSpacing, CrystalSpacing),
+            new Vector2(-CrystalSpacing, CrystalSpacing),
+            new Vector2(CrystalSpacing, -CrystalSpacing),
+            new Vector2(-CrystalSpacing, -CrystalSpacing)
+        };
+
+        wavesAll.Add(_crystal);
+        Ray blueRay = new Ray();
+        RaycastHit blueHit = new RaycastHit();
+        foreach (var pos in surroundOffsets)
+        {
+            Vector2 crystalPos = new Vector2(_crystal.transform.position.x, _crystal.transform.position.z);
+            Vector2 currentPosition = pos + crystalPos;
+
+            blueRay.origin = new Vector3(currentPosition.x, crystalHeight + 2.0f, currentPosition.y);
+            blueRay.direction = Vector3.down;
+            if (Physics.Raycast(blueRay, out blueHit, Mathf.Infinity))
+            {
+                if (blueHit.collider.gameObject.layer == 6)
+                {
+                    waveOne.Add(blueHit.collider.gameObject);
+                    wavesAll.Add(blueHit.collider.gameObject);
+                }
+            }
+        }
+
+        
+
+        foreach (var crystal in waveOne)
+        {
+            foreach (var pos in surroundOffsets)
+            {
+                Vector2 crystalPos = new Vector2(crystal.transform.position.x, crystal.transform.position.z);
+                Vector2 currentPosition = pos + crystalPos;
+
+                blueRay.origin = new Vector3(currentPosition.x, crystalHeight + 2.0f, currentPosition.y);
+                blueRay.direction = Vector3.down;
+                if (Physics.Raycast(blueRay, out blueHit, Mathf.Infinity))
+                {
+                    if (blueHit.collider.gameObject.layer == 6)
+                    {
+                        waveTwo.Add(blueHit.collider.gameObject);
+                        wavesAll.Add(blueHit.collider.gameObject);
+                    }
+                }
+            }
+        }
+
+
+        foreach (var crystal in wavesAll)
+        {
+            crystal.GetComponent<CrystalEvents>().GetMined();
+        }
     }
 
     private void GreenSpell()
@@ -450,6 +512,7 @@ public class PlayerStateMachine : MonoBehaviour
         m_YellowSpellElapsed = 0.0f;
         LevelManager.instance.CollectAction?.Invoke(-spellsCost, "Yellow");
         LevelManager.instance.SetSpellAvailable("Yellow", false);
+        LevelManager.instance.ActiveAction("Yellow", true);
     }
 
     private void RedSpell()
@@ -458,21 +521,45 @@ public class PlayerStateMachine : MonoBehaviour
         LevelManager.instance.RedSpellAction?.Invoke(m_RedSpellDamage);
         LevelManager.instance.SpellCastAction?.Invoke("Red");
         LevelManager.instance.SetSpellAvailable("Red", false);
+        m_AimSphere.SetActive(false);
     }
 
     private void SpellTimers()
     {
-        if (m_ShieldElapsed < m_ShieldTimer)
+        if (m_AimingBlue)
         {
-            m_Shield.transform.position = transform.position + new Vector3(0, 0.5f, 0);
-            m_ShieldElapsed += Time.deltaTime;
-        }
-        else if (m_Shield.activeSelf)
-        {
-            m_Shield.SetActive(false);
-            LevelManager.instance.SpellCastAction?.Invoke("Blue");
+            LayerMask crystalsLayer = 1 << 6;
+            m_MouseRay = m_MainCamera.ScreenPointToRay(Input.mousePosition);
+            if (Physics.Raycast(m_MouseRay, out m_TargetHit, Mathf.Infinity, crystalsLayer))
+            {
+                if (Input.GetMouseButtonDown(0))
+                {
+                    m_AimingBlue = false;
+                    BlueSpell(m_TargetHit.collider.gameObject);
+                    m_TargetCrystal = null;
+                    LevelManager.instance.ActiveAction("Blue", false);
+                }
+            }
+
+            if (Input.GetMouseButton(1))
+            {
+                m_AimingBlue = false;
+                LevelManager.instance.ActiveAction("Blue", false);
+            }
         }
 
+        // ============
+        // if (m_ShieldElapsed < m_ShieldTimer)
+        // {
+        //     m_Shield.transform.position = transform.position + new Vector3(0, 0.5f, 0);
+        //     m_ShieldElapsed += Time.deltaTime;
+        // }
+        // else if (m_Shield.activeSelf)
+        // {
+        //     m_Shield.SetActive(false);
+        //     LevelManager.instance.SpellCastAction?.Invoke("Blue");
+        // }
+        // ============
         if (m_YellowSpellElapsed < m_YellowSpellTimer)
         {
             LevelManager.instance.SetPlayerDamage(100);
@@ -482,9 +569,10 @@ public class PlayerStateMachine : MonoBehaviour
         {
             LevelManager.instance.SetPlayerDamage(m_MaxDamage);
             LevelManager.instance.SpellCastAction?.Invoke("Yellow");
+            LevelManager.instance.ActiveAction?.Invoke("Yellow", false);
         }
 
-        if (m_Aiming)
+        if (m_AimingRed)
         {
             LayerMask groundLayer = 1 << 8;
             m_MouseRay = m_MainCamera.ScreenPointToRay(Input.mousePosition);
@@ -501,12 +589,17 @@ public class PlayerStateMachine : MonoBehaviour
 
             if (Input.GetMouseButtonDown(0))
             {
-                m_Aiming = false;
+                m_AimingRed = false;
                 RedSpell();
+                m_AimSphere.SetActive(false);
+                LevelManager.instance.ActiveAction("Red", false);
+                LevelManager.instance.RedSpellAction = null;
             }
             else if (Input.GetMouseButton(1))
             {
-                m_Aiming = false;
+                m_AimingRed = false;
+                m_AimSphere.SetActive(false);
+                LevelManager.instance.ActiveAction("Red", false);
                 LevelManager.instance.RedSpellAction = null;
             }
         }

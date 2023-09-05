@@ -35,6 +35,7 @@ public class AiAttack : AiState
         m_Elapsed = 0.0f;
         m_Shot = false;
         m_Launched = false;
+        m_CooldownElapsed = 0.0f;
     }
 
     public override void UpdateExecute()

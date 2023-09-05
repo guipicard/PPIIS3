@@ -74,6 +74,7 @@ public class AIStateMachine : MonoBehaviour
     
     void Update()
     {
+        Debug.Log(m_CooldownElapsed);
         _currentState.UpdateExecute();
     }
 

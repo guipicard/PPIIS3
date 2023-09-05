@@ -164,7 +164,6 @@ public abstract class PlayerState
     m_YellowSpell = _stateMachine.m_YellowSpell;
     m_GreenSpell = _stateMachine.m_GreenSpell;
     m_RedSpell = _stateMachine.m_RedSpell;
-    m_Aiming = _stateMachine.m_Aiming;
     
     spellsCost = _stateMachine.spellsCost;
     unlockPrice = _stateMachine.unlockPrice;
