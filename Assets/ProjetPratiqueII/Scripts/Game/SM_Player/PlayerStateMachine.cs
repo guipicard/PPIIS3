@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine.UI;
 using TMPro;
 using UnityEditorInternal;
@@ -39,10 +40,7 @@ public class PlayerStateMachine : MonoBehaviour
     [SerializeField] public Canvas m_PlayerCanvas;
     [SerializeField] public GameObject m_AimSphere;
 
-    [Space(10)]
-    [Header("Attributes")]
-    [Space(10)]
-    [HideInInspector]
+    [Space(10)] [Header("Attributes")] [Space(10)] [HideInInspector]
     public float m_RegenerateAmount;
 
     [SerializeField] public float m_MinRegenerateAmount;
@@ -93,7 +91,9 @@ public class PlayerStateMachine : MonoBehaviour
     [Space]
     [Header("Blue Spell")]
     [Space] //
-    [SerializeField] private GameObject m_BlueBall;
+    [SerializeField]
+    private GameObject m_BlueBall;
+
     [SerializeField] private float m_BlueBallSpeed;
     [SerializeField] private float m_BlueBallTime;
 
@@ -121,6 +121,7 @@ public class PlayerStateMachine : MonoBehaviour
             this.next = new HashSet<GameObject>();
         }
     }
+
     void Start()
     {
         Init();
@@ -285,7 +286,6 @@ public class PlayerStateMachine : MonoBehaviour
     {
         if (!LevelManager.instance.playerGodmode)
         {
-
             m_Hp -= damage;
             if (m_Hp <= 0)
             {
@@ -458,26 +458,30 @@ public class PlayerStateMachine : MonoBehaviour
         LevelManager.instance.SpellCastAction?.Invoke("Blue");
         LevelManager.instance.SetSpellAvailable("Blue", false);
 
-        HashSet<CrystalWave> wavesAll = new HashSet<CrystalWave>();
+        HashSet<HashSet<CrystalWave>> wavesAll = new HashSet<HashSet<CrystalWave>>();
+        HashSet<CrystalWave> wavesOne = new HashSet<CrystalWave>();
+        HashSet<CrystalWave> wavesTwo = new HashSet<CrystalWave>();
+        HashSet<CrystalWave> wavesThree = new HashSet<CrystalWave>();
+
+        CrystalWave currentCW = new CrystalWave(1, _crystal);
 
         float CrystalSpacing = LevelManager.instance.m_CrystalSpaceBetween;
-        float crystalHeight = _crystal.transform.position.y;
+        float crystalHeight = currentCW.crystal.transform.position.y;
 
         Vector2[] surroundOffsets = new Vector2[4]
         {
-            new Vector2(CrystalSpacing, CrystalSpacing),
-            new Vector2(-CrystalSpacing, CrystalSpacing),
-            new Vector2(CrystalSpacing, -CrystalSpacing),
-            new Vector2(-CrystalSpacing, -CrystalSpacing)
+            new (CrystalSpacing, CrystalSpacing),
+            new (-CrystalSpacing, CrystalSpacing),
+            new (CrystalSpacing, -CrystalSpacing),
+            new (-CrystalSpacing, -CrystalSpacing)
         };
 
-        CrystalWave currentCW = new CrystalWave(1, _crystal);
-        wavesAll.Add(currentCW);
         Ray blueRay = new Ray();
         RaycastHit blueHit = new RaycastHit();
         foreach (var pos in surroundOffsets)
         {
-            Vector2 crystalPos = new Vector2(_crystal.transform.position.x, _crystal.transform.position.z);
+            Vector2 crystalPos = new Vector2(currentCW.crystal.transform.position.x,
+                currentCW.crystal.transform.position.z);
             Vector2 currentPosition = pos + crystalPos;
 
             blueRay.origin = new Vector3(currentPosition.x, crystalHeight + 2.0f, currentPosition.y);
@@ -486,16 +490,17 @@ public class PlayerStateMachine : MonoBehaviour
             {
                 if (blueHit.collider.gameObject.layer == 6)
                 {
-                    GameObject curentCrystal = blueHit.collider.gameObject;
-                    currentCW.next.Add(curentCrystal);
-                    wavesAll.Add(new CrystalWave(currentCW.wave + 1, curentCrystal));
+                    GameObject currentCrystal = blueHit.collider.gameObject;
+                    currentCW.next.Add(currentCrystal);
+                    wavesTwo.Add(new CrystalWave(currentCW.wave + 1, currentCrystal));
                 }
             }
         }
 
+        wavesOne.Add(currentCW);
 
 
-        foreach (var crystal in wavesAll)
+        foreach (var crystal in wavesTwo)
         {
             if (crystal.wave == 2)
             {
@@ -510,24 +515,35 @@ public class PlayerStateMachine : MonoBehaviour
                     {
                         if (blueHit.collider.gameObject.layer == 6)
                         {
-                            GameObject curentCrystal = blueHit.collider.gameObject;
-                            crystal.next.Add(curentCrystal);
-                            wavesAll.Add(new CrystalWave(3, curentCrystal));
+                            GameObject currentCrystal = blueHit.collider.gameObject;
+                            crystal.next.Add(currentCrystal);
+                            wavesThree.Add(new CrystalWave(crystal.wave + 1, currentCrystal));
                         }
                     }
                 }
             }
         }
 
+        wavesAll.Add(wavesOne);
+        wavesAll.Add(wavesTwo);
+        // wavesAll.Add(wavesThree);
 
-        foreach (var crystal in wavesAll)
+        foreach (var wave in wavesAll)
         {
-            if (crystal.wave == 1)
+            foreach (var crystal in wave)
             {
-                
+                GameObject crystalObj = crystal.crystal;
+                foreach (var destination in crystal.next)
+                {
+                    GameObject blueBall = Instantiate(m_BlueBall);
+                    BlueBallBehaviour ballScript = blueBall.GetComponent<BlueBallBehaviour>();
+                    ballScript.SetInitialPos(crystalObj.transform.position);
+                    ballScript.SetTarget(destination);
+                    ballScript.SetTimer(crystal.wave - 1);
+                }
             }
-            //crystal.GetComponent<CrystalEvents>().GetMined();
         }
+        _crystal.GetComponent<CrystalEvents>().GetMined();
     }
 
     private void GreenSpell()
@@ -644,7 +660,6 @@ public class PlayerStateMachine : MonoBehaviour
                 "Boss room has been opened but cannot be accessed for the moment.");
         }
     }
-
 
 
     private void ToggleEnableOutline(bool _state)

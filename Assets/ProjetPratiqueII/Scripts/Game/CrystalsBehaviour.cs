@@ -173,7 +173,7 @@ public class CrystalsBehaviour : MonoBehaviour
             crystalList = m_LastCrystalWave;
         }
 
-        if (crystalList.Count < 4)
+        if (LevelManager.instance.GetActiveInScene(m_AiTag).Count < 2)
         {
             int spawnPointCrystalIndex = Random.Range(0, crystalList.Count == 0 ? 0 : crystalList.Count);
             Vector2 spawnPointCrystal = crystalList[spawnPointCrystalIndex];
