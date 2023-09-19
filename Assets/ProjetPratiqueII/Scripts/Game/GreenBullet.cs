@@ -55,9 +55,9 @@ public class GreenBullet : MonoBehaviour
     {
         if (m_Detonate)
         {
-            if (m_SphereCollier.enabled) m_SphereCollier.radius = Mathf.Lerp(m_SphereColliderStartSize, 20.0f, m_Elapsed / 0.7f);
+            if (m_SphereCollier.enabled) m_SphereCollier.radius = Mathf.Lerp(m_SphereColliderStartSize, 5.0f, m_Elapsed * 2.0f);
             m_Elapsed += Time.deltaTime;
-            if (m_Elapsed >= 0.7f)
+            if (m_Elapsed >= 0.5f)
             {
                 m_SphereCollier.enabled = false;
             }

@@ -16,12 +16,12 @@ public class CrystalEvents : MonoBehaviour
     {
         m_CrystalsBehaviour = transform.parent.GetComponent<CrystalsBehaviour>();
         m_CanGetDestroyed = Vector3.Distance(transform.position, m_InitialPosition) > 9.0f;
-        m_OutlineScript = GetComponent<Outline>();
-        m_OutlineScript.enabled = false;
     }
 
     private void OnEnable()
     {
+        m_OutlineScript = GetComponent<Outline>();
+        m_OutlineScript.enabled = false;
         m_CanGetDestroyed = Vector3.Distance(transform.position, m_InitialPosition) > 9.0f;
     }
 
