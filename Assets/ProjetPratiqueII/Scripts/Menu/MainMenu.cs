@@ -9,6 +9,8 @@ public class MainMenu : MonoBehaviour
     [SerializeField] private Slider m_ProgressBar;
     [SerializeField] private GameObject m_LoadScreen;
 
+    private AsyncOperation scene;
+
     private void Start()
     {
         m_LoadScreen.SetActive(false);
@@ -20,7 +22,7 @@ public class MainMenu : MonoBehaviour
 
     private IEnumerator LoadGame()
     {
-        AsyncOperation scene = SceneManager.LoadSceneAsync("Game");
+        scene = SceneManager.LoadSceneAsync("Game");
         m_LoadScreen.SetActive(true);
         while (true)
         {
@@ -30,7 +32,7 @@ public class MainMenu : MonoBehaviour
             }
             else
             {
-                m_ProgressBar.value = scene.progress;
+                UpdateBar();
                 yield return null;
             }
         }
@@ -39,5 +41,10 @@ public class MainMenu : MonoBehaviour
     public void QuitGame()
     {
         Application.Quit();
+    }
+
+    private void UpdateBar()
+    {
+        m_ProgressBar.value = scene.progress;
     }
 }

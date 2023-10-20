@@ -155,6 +155,14 @@ public class PlayerStateMachine : MonoBehaviour
         UpdateHealthBar();
         m_YellowSpellActive = false;
 
+        transform.position = LevelManager.instance.Worlds[0].entrancePosition;
+        transform.eulerAngles = LevelManager.instance.Worlds[0].entranceRotation;
+
+        LevelManager.instance.NextBiomeAction += TeleportNext;
+        LevelManager.instance.LastBiomeAction += TeleportLast;
+        LevelManager.instance.NextAnimAction += TeleportNextAnim;
+        LevelManager.instance.LastAnimAction += TeleportLastAnim;
+
         SetState(new PlayerIdle(this));
     }
 
@@ -165,14 +173,15 @@ public class PlayerStateMachine : MonoBehaviour
 
     void Update()
     {
-        SpellsInput();
-        SetInteraction();
-
+        if (LevelManager.instance.takeInput)
+        {
+            SpellsInput();
+            SetInteraction();
+            CheckBoosRoom();
+            SpellTimers();
+        }
 
         _currentState.UpdateExecute();
-
-        CheckBoosRoom();
-        SpellTimers();
     }
 
     private void FixedUpdate()
@@ -330,6 +339,7 @@ public class PlayerStateMachine : MonoBehaviour
                 if (LevelManager.instance.GetCollected("Blue") >= unlockPrice)
                 {
                     unlockSpell("Blue");
+                    LevelManager.instance.UnlockBiome();
                 }
                 else
                 {
@@ -357,6 +367,7 @@ public class PlayerStateMachine : MonoBehaviour
                 if (LevelManager.instance.GetCollected("Yellow") >= unlockPrice)
                 {
                     unlockSpell("Yellow");
+                    LevelManager.instance.UnlockBiome();
                 }
                 else
                 {
@@ -384,6 +395,7 @@ public class PlayerStateMachine : MonoBehaviour
                 if (LevelManager.instance.GetCollected("Green") >= unlockPrice)
                 {
                     unlockSpell("Green");
+                    LevelManager.instance.UnlockBiome();
                 }
                 else
                 {
@@ -414,6 +426,7 @@ public class PlayerStateMachine : MonoBehaviour
                 if (LevelManager.instance.GetCollected("Red") >= unlockPrice)
                 {
                     unlockSpell("Red");
+                    LevelManager.instance.UnlockBiome();
                 }
                 else
                 {
@@ -470,10 +483,10 @@ public class PlayerStateMachine : MonoBehaviour
 
         Vector2[] surroundOffsets = new Vector2[4]
         {
-            new (CrystalSpacing, CrystalSpacing),
-            new (-CrystalSpacing, CrystalSpacing),
-            new (CrystalSpacing, -CrystalSpacing),
-            new (-CrystalSpacing, -CrystalSpacing)
+            new(CrystalSpacing, CrystalSpacing),
+            new(-CrystalSpacing, CrystalSpacing),
+            new(CrystalSpacing, -CrystalSpacing),
+            new(-CrystalSpacing, -CrystalSpacing)
         };
 
         Ray blueRay = new Ray();
@@ -506,7 +519,8 @@ public class PlayerStateMachine : MonoBehaviour
             {
                 foreach (var pos in surroundOffsets)
                 {
-                    Vector2 crystalPos = new Vector2(crystal.crystal.transform.position.x, crystal.crystal.transform.position.z);
+                    Vector2 crystalPos = new Vector2(crystal.crystal.transform.position.x,
+                        crystal.crystal.transform.position.z);
                     Vector2 currentPosition = pos + crystalPos;
 
                     blueRay.origin = new Vector3(currentPosition.x, crystalHeight + 2.0f, currentPosition.y);
@@ -543,6 +557,7 @@ public class PlayerStateMachine : MonoBehaviour
                 }
             }
         }
+
         _crystal.GetComponent<CrystalEvents>().GetMined();
     }
 
@@ -675,5 +690,39 @@ public class PlayerStateMachine : MonoBehaviour
         {
             Cursor.SetCursor(m_AttackCursor, Vector2.zero, CursorMode.Auto);
         }
+    }
+
+    private void TeleportNextAnim(Biome _biome)
+    {
+ 
+        m_TargetCrystal = null;
+        m_StoppingDistance = 0;
+        m_Destination = _biome.EndRoad;
+        SetState(new PlayerMoving(this));
+    }
+
+    private void TeleportLastAnim(Biome _biome)
+    {
+        
+        m_TargetCrystal = null;
+        m_StoppingDistance = 0;
+        m_Destination = _biome.StartRoad;
+        SetState(new PlayerMoving(this));
+    }
+
+    private void TeleportNext(Biome _biome)
+    {
+        transform.position = _biome.StartRoad;
+        transform.eulerAngles = _biome.entranceRotation;
+        m_Destination = _biome.entrancePosition;
+        SetState(new PlayerMoving(this));
+    }
+
+    private void TeleportLast(Biome _biome)
+    {
+        transform.position = _biome.EndRoad;
+        transform.eulerAngles = _biome.exitRotation;
+        m_Destination = _biome.exitPosition;
+        SetState(new PlayerMoving(this));
     }
 }

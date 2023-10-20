@@ -26,6 +26,10 @@ public class LevelManager : MonoBehaviour
     public Action<float> RedSpellAction;
     public Action<string> SpellCastAction;
     public Action<string, bool> ActiveAction;
+    public Action<Biome> NextBiomeAction;
+    public Action<Biome> LastBiomeAction;
+    public Action<Biome> NextAnimAction;
+    public Action<Biome> LastAnimAction;
 
     private bool m_BlueSpellAvailable;
     private bool m_YellowSpellAvailable;
@@ -39,7 +43,20 @@ public class LevelManager : MonoBehaviour
 
     public bool playerGodmode;
 
+    public List<List<GameObject>> SpawnPoints;
+
     private static LevelManager levelManager;
+
+    public string currentWorld = "";
+    public List<Biome> Worlds;
+    public Dictionary<string, GameObject> WorldObjects;
+    public List<string> WorldObjectNames;
+    [SerializeField] private List<GameObject> Blockades;
+
+    public bool inSequence;
+    public bool takeInput;
+
+    private Camera m_MainCamera;
 
     public static LevelManager instance
     {
@@ -69,11 +86,14 @@ public class LevelManager : MonoBehaviour
 
     void Start()
     {
-        // LoadLevel();
     }
 
     public void LoadLevel()
     {
+        m_MainCamera = Camera.main;
+        inSequence = false;
+        takeInput = true;
+        currentWorld = Worlds[0].name;
         m_Pools = GameObject.FindObjectOfType<ObjPool>();
         if (!m_Pools) return;
         playerDamage = 20.0f;
@@ -88,6 +108,18 @@ public class LevelManager : MonoBehaviour
         m_YellowCollected = 0;
         m_BlueCollected = 0;
         playerGodmode = false;
+        WorldObjects = new Dictionary<string, GameObject>();
+        WorldObjectNames = new List<string>();
+        WorldObjectNames.Add("IceEnv");
+        WorldObjectNames.Add("EarthEnv");
+        WorldObjectNames.Add("LavaEnv");
+        WorldObjectNames.Add("DesertEnv");
+        for (int i = 0; i < Worlds.Count; i++)
+        {
+            GameObject obj = GameObject.Find(WorldObjectNames[i]);
+            WorldObjects.Add(Worlds[i].name, obj);
+            if (i != 0) obj.SetActive(false);
+        }
     }
 
     public GameObject SpawnObj(string _tag, Vector3 _position, Quaternion _rotation)
@@ -215,13 +247,74 @@ public class LevelManager : MonoBehaviour
         }
     }
 
-    // public void SetTarget(GameObject _target)
-    // {
-    //     m_EnemyTarget = _target;
-    // }
-    //
-    // public GameObject GetTarget()
-    // {
-    //     return m_EnemyTarget;
-    // }
+    private void SetBiome(string _name)
+    {
+        currentWorld = _name;
+    }
+
+    private int GetBiomeIndex()
+    {
+        int index = 0;
+        for (int i = 0; i < Worlds.Count; i++)
+        {
+            if (Worlds[i].name == currentWorld)
+            {
+                index = i;
+                break;
+            }
+        }
+        return index;
+    }
+
+    public void AnimNextBiome()
+    {
+        takeInput = false;
+        int biomeIndex = GetBiomeIndex();
+        NextAnimAction?.Invoke(Worlds[biomeIndex]);
+    }
+    
+    public void AnimLastBiome()
+    {
+        takeInput = false;
+        int biomeIndex = GetBiomeIndex();
+        LastAnimAction?.Invoke(Worlds[biomeIndex]);
+    }
+
+    public void GoNextBiome()
+    {
+        inSequence = true;
+        int biomeIndex = GetBiomeIndex();
+        string nextBiomeName = Worlds[biomeIndex+1].name;
+        WorldObjects[nextBiomeName].SetActive(true);
+        NextBiomeAction?.Invoke(Worlds[biomeIndex + 1]);
+
+        m_MainCamera.transform.position = Worlds[biomeIndex + 1].entrancePosition + new Vector3(0, 2, 0) - m_MainCamera.GetComponent<CameraFollow>().GetOffset();
+        WorldObjects[currentWorld].SetActive(false);
+        currentWorld = Worlds[biomeIndex + 1].name;
+    }
+    
+    public void GoLastBiome()
+    {
+        inSequence = true;
+        int biomeIndex = GetBiomeIndex();
+        string nextBiomeName = Worlds[biomeIndex-1].name;
+        WorldObjects[nextBiomeName].SetActive(true);
+        LastBiomeAction?.Invoke(Worlds[biomeIndex-1]);
+        
+        m_MainCamera.transform.position = Worlds[biomeIndex - 1].exitPosition + new Vector3(0, 2, 0) - m_MainCamera.GetComponent<CameraFollow>().GetOffset();
+        WorldObjects[currentWorld].SetActive(false);
+        currentWorld = Worlds[biomeIndex - 1].name;
+    }
+
+    public void UnlockBiome()
+    {
+        foreach (var barrage in Blockades)
+        {
+            if (barrage.activeSelf)
+            {
+                barrage.SetActive(false);
+                break;
+            }
+        }
+    }
 }
