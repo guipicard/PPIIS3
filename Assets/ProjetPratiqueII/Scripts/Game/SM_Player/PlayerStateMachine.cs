@@ -40,7 +40,10 @@ public class PlayerStateMachine : MonoBehaviour
     [SerializeField] public Canvas m_PlayerCanvas;
     [SerializeField] public GameObject m_AimSphere;
 
-    [Space(10)] [Header("Attributes")] [Space(10)] [HideInInspector]
+    [Space(10)]
+    [Header("Attributes")]
+    [Space(10)]
+    [HideInInspector]
     public float m_RegenerateAmount;
 
     [SerializeField] public float m_MinRegenerateAmount;
@@ -82,20 +85,19 @@ public class PlayerStateMachine : MonoBehaviour
     [HideInInspector] public bool m_GreenSpell;
     [HideInInspector] public bool m_RedSpell;
     [HideInInspector] public bool m_AimingRed;
-    [HideInInspector] public bool m_AimingBlue;
+    [HideInInspector] public bool m_AimingYellow;
     [SerializeField] public Vector3 m_AimOffset;
-    [HideInInspector] public int spellsCost;
+    [SerializeField] public int m_BlueSpellCost;
+    [SerializeField] public int m_GreenSpellCost;
+    [SerializeField] public int m_RedSpellCost;
+    [SerializeField] public int m_YellowSpellCost;
     [HideInInspector] public int unlockPrice;
-    [HideInInspector] public Quaternion m_BulletRotation;
 
     [Space]
     [Header("Blue Spell")]
     [Space] //
     [SerializeField]
     private GameObject m_BlueBall;
-
-    [SerializeField] private float m_BlueBallSpeed;
-    [SerializeField] private float m_BlueBallTime;
 
     [Space]
     [Header("Cursor")]
@@ -129,11 +131,9 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void Init()
     {
-        m_BulletRotation = Quaternion.identity;
-        spellsCost = LevelManager.instance.m_SpellsCost;
         unlockPrice = LevelManager.instance.m_UnlockPrice;
         m_AimSphere.SetActive(false);
-        m_AimingBlue = false;
+        m_AimingYellow = false;
         m_AimingRed = false;
         m_Mining = false;
         m_BlueSpell = false;
@@ -154,6 +154,8 @@ public class PlayerStateMachine : MonoBehaviour
         m_OutlinedGameObject = null;
         UpdateHealthBar();
         m_YellowSpellActive = false;
+
+        unlockSpell("Blue");
 
         transform.position = LevelManager.instance.Worlds[0].entrancePosition;
         transform.eulerAngles = LevelManager.instance.Worlds[0].entranceRotation;
@@ -177,7 +179,6 @@ public class PlayerStateMachine : MonoBehaviour
         {
             SpellsInput();
             SetInteraction();
-            CheckBoosRoom();
             SpellTimers();
         }
 
@@ -203,31 +204,7 @@ public class PlayerStateMachine : MonoBehaviour
                 SetState(new PlayerMoving(this));
             }
         }
-
-        if (Input.GetKeyDown(KeyCode.Q)) // AUTO ATTACK
-        {
-            if (Physics.Raycast(m_TargetRay, out m_TargetHit))
-            {
-                if (m_TargetHit.collider.gameObject.layer == 7)
-                {
-                    if (Vector3.Distance(transform.position, m_TargetHit.collider.transform.position) < m_AttackRange)
-                    {
-                        m_TargetCrystal = null;
-                        m_TargetEnemy = m_TargetHit.collider.gameObject;
-                        LaunchBasicAttack();
-                    }
-                    else
-                    {
-                        LevelManager.instance.ErrorAction?.Invoke("Target out of range.");
-                    }
-                }
-                else
-                {
-                    LevelManager.instance.ErrorAction?.Invoke("Invalid target.");
-                }
-            }
-        }
-        else if (Input.GetKeyDown(KeyCode.Space)) // MINING
+        if (Input.GetMouseButtonDown(0)) // MINING
         {
             if (Physics.Raycast(m_TargetRay, out m_TargetHit))
             {
@@ -322,62 +299,33 @@ public class PlayerStateMachine : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Alpha1)) // Blue
         {
-            if (m_BlueSpell)
+            if (LevelManager.instance.GetSpellAvailable("Blue"))
             {
-                if (LevelManager.instance.GetSpellAvailable("Blue"))
+
+                if (Physics.Raycast(m_TargetRay, out m_TargetHit))
                 {
-                    m_AimingBlue = !m_AimingBlue;
-                    LevelManager.instance.ActiveAction("Blue", m_AimingBlue);
-                }
-                else
-                {
-                    LevelManager.instance.ErrorAction?.Invoke("Spell not available.");
-                }
-            }
-            else
-            {
-                if (LevelManager.instance.GetCollected("Blue") >= unlockPrice)
-                {
-                    unlockSpell("Blue");
-                    LevelManager.instance.UnlockBiome();
-                }
-                else
-                {
-                    LevelManager.instance.ErrorAction?.Invoke(
-                        $"Collect {unlockPrice} blue crystals to unlock this spell.");
+                    if (m_TargetHit.collider.gameObject.layer == 7)
+                    {
+                        if (Vector3.Distance(transform.position, m_TargetHit.collider.transform.position) < m_AttackRange)
+                        {
+                            m_TargetCrystal = null;
+                            m_TargetEnemy = m_TargetHit.collider.gameObject;
+                            BlueSpell();
+                        }
+                        else
+                        {
+                            LevelManager.instance.ErrorAction?.Invoke("Target out of range.");
+                        }
+                    }
+                    else
+                    {
+                        LevelManager.instance.ErrorAction?.Invoke("Invalid target.");
+                    }
                 }
             }
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha2)) // Yellow
-        {
-            if (m_YellowSpell)
-            {
-                if (LevelManager.instance.GetSpellAvailable("Yellow"))
-                {
-                    YellowSpell();
-                }
-                else
-                {
-                    LevelManager.instance.ErrorAction?.Invoke("Spell not available.");
-                }
-            }
-            else
-            {
-                if (LevelManager.instance.GetCollected("Yellow") >= unlockPrice)
-                {
-                    unlockSpell("Yellow");
-                    LevelManager.instance.UnlockBiome();
-                }
-                else
-                {
-                    LevelManager.instance.ErrorAction?.Invoke(
-                        $"Collect {unlockPrice} yellow crystals to unlock this spell.");
-                }
-            }
-        }
-
-        if (Input.GetKeyDown(KeyCode.Alpha3)) // Green
+        if (Input.GetKeyDown(KeyCode.Alpha2)) // Green
         {
             if (m_GreenSpell)
             {
@@ -390,22 +338,9 @@ public class PlayerStateMachine : MonoBehaviour
                     LevelManager.instance.ErrorAction?.Invoke("Spell not available.");
                 }
             }
-            else
-            {
-                if (LevelManager.instance.GetCollected("Green") >= unlockPrice)
-                {
-                    unlockSpell("Green");
-                    LevelManager.instance.UnlockBiome();
-                }
-                else
-                {
-                    LevelManager.instance.ErrorAction?.Invoke(
-                        $"Collect {unlockPrice} green crystals to unlock this spell.");
-                }
-            }
         }
 
-        if (Input.GetKeyDown(KeyCode.Alpha4)) // Red
+        if (Input.GetKeyDown(KeyCode.Alpha3)) // Red
         {
             if (m_RedSpell)
             {
@@ -421,17 +356,21 @@ public class PlayerStateMachine : MonoBehaviour
                     LevelManager.instance.ErrorAction?.Invoke("Spell not available.");
                 }
             }
-            else
+        }
+
+        if (Input.GetKeyDown(KeyCode.Alpha4)) // Yellow
+        {
+            if (m_YellowSpell)
             {
-                if (LevelManager.instance.GetCollected("Red") >= unlockPrice)
+                if (LevelManager.instance.GetSpellAvailable("Yellow"))
                 {
-                    unlockSpell("Red");
-                    LevelManager.instance.UnlockBiome();
+                    m_AimingYellow = true;
+                    m_AimingYellow = !m_AimingYellow;
+                    LevelManager.instance.ActiveAction("Yellow", m_AimingYellow);
                 }
                 else
                 {
-                    LevelManager.instance.ErrorAction?.Invoke(
-                        $"Collect {unlockPrice} red crystals to unlock this spell.");
+                    LevelManager.instance.ErrorAction?.Invoke("Spell not available.");
                 }
             }
         }
@@ -444,8 +383,6 @@ public class PlayerStateMachine : MonoBehaviour
             case "Blue":
                 m_BlueSpell = true;
                 LevelManager.instance.CollectAction?.Invoke(-unlockPrice, "Blue");
-                m_HealthCapacity = m_MaxHealth;
-                m_Hp += 50.0f;
                 break;
             case "Green":
                 m_GreenSpell = true;
@@ -461,15 +398,41 @@ public class PlayerStateMachine : MonoBehaviour
             case "Red":
                 m_RedSpell = true;
                 LevelManager.instance.CollectAction?.Invoke(-unlockPrice, "Red");
+                m_HealthCapacity = m_MaxHealth;
+                m_Hp += 50.0f;
                 break;
         }
     }
-
-    private void BlueSpell(GameObject _crystal)
+    private void BlueSpell()
     {
-        LevelManager.instance.CollectAction?.Invoke(-spellsCost, "Blue");
-        LevelManager.instance.SpellCastAction?.Invoke("Blue");
-        LevelManager.instance.SetSpellAvailable("Blue", false);
+        LevelManager.instance.CollectAction?.Invoke(-m_BlueSpellCost, "Blue");
+        LaunchBasicAttack();
+    }
+
+
+    private void GreenSpell()
+    {
+        Heal(m_HealAmount);
+        LevelManager.instance.CollectAction?.Invoke(-m_GreenSpellCost, "Green");
+        LevelManager.instance.SpellCastAction?.Invoke("Green");
+        LevelManager.instance.SetSpellAvailable("Green", false);
+    }
+
+    private void RedSpell()
+    {
+        LevelManager.instance.CollectAction?.Invoke(-m_RedSpellCost, "Red");
+        LevelManager.instance.RedSpellAction?.Invoke(m_RedSpellDamage);
+        LevelManager.instance.SpellCastAction?.Invoke("Red");
+        LevelManager.instance.SetSpellAvailable("Red", false);
+        m_AimSphere.SetActive(false);
+    }
+
+    private void YellowSpell(GameObject _crystal)
+    {
+        m_YellowSpellElapsed = 0.0f;
+        LevelManager.instance.CollectAction?.Invoke(-m_YellowSpellCost, "Yellow");
+        LevelManager.instance.SpellCastAction?.Invoke("Yellow");
+        LevelManager.instance.SetSpellAvailable("Yellow", false);
 
         HashSet<HashSet<CrystalWave>> wavesAll = new HashSet<HashSet<CrystalWave>>();
         HashSet<CrystalWave> wavesOne = new HashSet<CrystalWave>();
@@ -561,35 +524,9 @@ public class PlayerStateMachine : MonoBehaviour
         _crystal.GetComponent<CrystalEvents>().GetMined();
     }
 
-    private void GreenSpell()
-    {
-        Heal(m_HealAmount);
-        LevelManager.instance.CollectAction?.Invoke(-spellsCost, "Green");
-        LevelManager.instance.SpellCastAction?.Invoke("Green");
-        LevelManager.instance.SetSpellAvailable("Green", false);
-    }
-
-    private void YellowSpell()
-    {
-        m_YellowSpellElapsed = 0.0f;
-        m_YellowSpellActive = true;
-        LevelManager.instance.CollectAction?.Invoke(-spellsCost, "Yellow");
-        LevelManager.instance.SetSpellAvailable("Yellow", false);
-        LevelManager.instance.ActiveAction("Yellow", true);
-    }
-
-    private void RedSpell()
-    {
-        LevelManager.instance.CollectAction?.Invoke(-spellsCost, "Red");
-        LevelManager.instance.RedSpellAction?.Invoke(m_RedSpellDamage);
-        LevelManager.instance.SpellCastAction?.Invoke("Red");
-        LevelManager.instance.SetSpellAvailable("Red", false);
-        m_AimSphere.SetActive(false);
-    }
-
     private void SpellTimers()
     {
-        if (m_AimingBlue)
+        if (m_AimingYellow)
         {
             LayerMask crystalsLayer = 1 << 6;
             m_MouseRay = m_MainCamera.ScreenPointToRay(Input.mousePosition);
@@ -597,30 +534,17 @@ public class PlayerStateMachine : MonoBehaviour
             {
                 if (Input.GetMouseButtonDown(0))
                 {
-                    m_AimingBlue = false;
-                    BlueSpell(m_TargetHit.collider.gameObject);
+                    m_AimingYellow = false;
+                    YellowSpell(m_TargetHit.collider.gameObject);
                     m_TargetCrystal = null;
-                    LevelManager.instance.ActiveAction("Blue", false);
+                    LevelManager.instance.ActiveAction("Yellow", false);
                 }
             }
 
             if (Input.GetMouseButton(1))
             {
-                m_AimingBlue = false;
-                LevelManager.instance.ActiveAction("Blue", false);
-            }
-        }
-
-        if (m_YellowSpellActive)
-        {
-            LevelManager.instance.SetPlayerDamage(100);
-            m_YellowSpellElapsed += Time.deltaTime;
-            if (m_YellowSpellElapsed > m_YellowSpellTimer)
-            {
-                LevelManager.instance.SetPlayerDamage(m_MaxDamage);
-                m_YellowSpellActive = false;
-                LevelManager.instance.ActiveAction?.Invoke("Yellow", false);
-                LevelManager.instance.SpellCastAction?.Invoke("Yellow");
+                m_AimingYellow = false;
+                LevelManager.instance.ActiveAction("Yellow", false);
             }
         }
 
@@ -666,16 +590,6 @@ public class PlayerStateMachine : MonoBehaviour
         }
     }
 
-    private void CheckBoosRoom()
-    {
-        if (m_BlueSpell && m_YellowSpell && m_GreenSpell && m_RedSpell && m_BossDoor.activeSelf)
-        {
-            m_BossDoor.SetActive(false);
-            LevelManager.instance.ErrorAction?.Invoke(
-                "Boss room has been opened but cannot be accessed for the moment.");
-        }
-    }
-
 
     private void ToggleEnableOutline(bool _state)
     {
@@ -694,7 +608,7 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void TeleportNextAnim(Biome _biome)
     {
- 
+
         m_TargetCrystal = null;
         m_StoppingDistance = 0;
         m_Destination = _biome.EndRoad;
@@ -703,7 +617,7 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void TeleportLastAnim(Biome _biome)
     {
-        
+
         m_TargetCrystal = null;
         m_StoppingDistance = 0;
         m_Destination = _biome.StartRoad;

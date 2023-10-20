@@ -162,8 +162,6 @@ public abstract class PlayerState
     m_GreenSpell = _stateMachine.m_GreenSpell;
     m_RedSpell = _stateMachine.m_RedSpell;
     
-    spellsCost = _stateMachine.spellsCost;
     unlockPrice = _stateMachine.unlockPrice;
-    m_BulletRotation = _stateMachine.m_BulletRotation;
     }
 }
