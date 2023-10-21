@@ -25,8 +25,7 @@ public class CrystalsBehaviour : MonoBehaviour
     private float m_CrystalHeight;
     private float CrystalSpacing;
     private Vector2[] m_SurroundOffsets;
-
-
+    
     void Start()
     {
         m_InitialPositions = new List<Vector3>();
@@ -186,7 +185,7 @@ public class CrystalsBehaviour : MonoBehaviour
             crystalList = m_LastCrystalWave;
         }
 
-        bool aiCap = LevelManager.instance.GetActiveInScene(m_AiTag).Count > 5;
+        bool aiCap = LevelManager.instance.GetActiveInScene(m_AiTag).Count > 10;
         bool enoughCrystals = crystalList.Count < (6 / m_InitialPositions.Count);
         if (aiCap || enoughCrystals) return;
 

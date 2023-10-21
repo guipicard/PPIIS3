@@ -18,12 +18,15 @@ public class UiComponents : MonoBehaviour
     [SerializeField] private TextMeshProUGUI m_GreenCooldownText;
     [SerializeField] private TextMeshProUGUI m_RedCooldownText;
 
-    [SerializeField] private float m_BlueSpellTimer;
+    [SerializeField] private TextMeshPro m_BlueInputText;
+    [SerializeField] private TextMeshPro m_YellowInputText;
+    [SerializeField] private TextMeshPro m_GreenInputText;
+    [SerializeField] private TextMeshPro m_RedInputText;
+    
     [SerializeField] private float m_YellowSpellTimer;
     [SerializeField] private float m_GreenSpellTimer;
     [SerializeField] private float m_RedSpellTimer;
 
-    private float m_BlueSpellElapsed;
     private float m_YellowSpellElapsed;
     private float m_GreenSpellElapsed;
     private float m_RedSpellElapsed;
@@ -46,14 +49,17 @@ public class UiComponents : MonoBehaviour
     private int GreenPrice;
     private int RedPrice;
 
-    private int spellsCost;
+    private int m_BlueSpellCost;
+    private int m_GreenSpellCost;
+    private int m_RedSpellCost;
+    private int m_YellowSpellCost;
+
     private int unlockPrice;
 
     void Start()
     {
         m_ErrorElapsed = 0.0f;
 
-        spellsCost = LevelManager.instance.m_SpellsCost;
         unlockPrice = LevelManager.instance.m_UnlockPrice;
 
         LevelManager.instance.ErrorAction += ShowErrorMessage;
@@ -61,24 +67,33 @@ public class UiComponents : MonoBehaviour
         LevelManager.instance.SpellCastAction += TriggerSpell;
         LevelManager.instance.ActiveAction += ActivateSpell;
 
-        ChangeAlpha(m_BlueCrystalImage, 0.2f);
-        ChangeAlpha(m_GreenCrystalImage, 0.2f);
-        ChangeAlpha(m_YellowCrystalImage, 0.2f);
-        ChangeAlpha(m_RedCrystalImage, 0.2f);
+        ChangeAlpha(m_BlueCrystalImage, 0.0f);
+        ChangeAlpha(m_GreenCrystalImage, 0.0f);
+        ChangeAlpha(m_YellowCrystalImage, 0.0f);
+        ChangeAlpha(m_RedCrystalImage, 0.0f);
 
         BluePrice = unlockPrice;
         YellowPrice = unlockPrice;
         GreenPrice = unlockPrice;
         RedPrice = unlockPrice;
 
+        m_BlueSpellCost = LevelManager.instance.m_BlueSpellCost;
+        m_GreenSpellCost = LevelManager.instance.m_GreenSpellCost;
+        m_RedSpellCost = LevelManager.instance.m_RedSpellCost;
+        m_YellowSpellCost = LevelManager.instance.m_YellowSpellCost;
+
         paused = false;
         m_PauseScreen.SetActive(false);
         Time.timeScale = 1;
 
-        m_BlueSpellElapsed = 0.0f;
         m_YellowSpellElapsed = 0.0f;
         m_GreenSpellElapsed = 0.0f;
         m_RedSpellElapsed = -1.0f;
+
+        m_BlueInputText.alpha = 0.0f;
+        m_GreenInputText.alpha = 0.0f;
+        m_RedInputText.alpha = 0.0f;
+        m_YellowInputText.alpha = 0.0f;
     }
 
     void Update()
@@ -88,25 +103,13 @@ public class UiComponents : MonoBehaviour
             PauseToggle();
         }
 
-        if (m_BlueSpellElapsed > 0)
-        {
-            m_BlueSpellElapsed -= Time.deltaTime;
-            m_BlueCooldownText.text = $"{Mathf.Ceil(m_BlueSpellElapsed)}";
-            ChangeAlpha(m_BlueCrystalImage, 0.2f);
-        }
-        else if (m_BlueCooldownText.alpha != 0.0f && BluePrice == spellsCost)
-        {
-            m_BlueCooldownText.alpha = 0.0f;
-            UpdateUi(0, "Blue");
-        }
-
         if (m_YellowSpellElapsed > 0)
         {
             m_YellowSpellElapsed -= Time.deltaTime;
             m_YellowCooldownText.text = $"{Mathf.Ceil(m_YellowSpellElapsed)}";
             ChangeAlpha(m_YellowCrystalImage, 0.2f);
         }
-        else if (m_YellowCooldownText.alpha != 0.0f && YellowPrice == spellsCost)
+        else if (m_YellowCooldownText.alpha != 0.0f && YellowPrice == m_YellowSpellCost)
         {
             m_YellowCooldownText.alpha = 0.0f;
             UpdateUi(0, "Yellow");
@@ -118,7 +121,7 @@ public class UiComponents : MonoBehaviour
             m_GreenCooldownText.text = $"{Mathf.Ceil(m_GreenSpellElapsed)}";
             ChangeAlpha(m_GreenCrystalImage, 0.2f);
         }
-        else if (m_GreenCooldownText.alpha != 0.0f && GreenPrice == spellsCost)
+        else if (m_GreenCooldownText.alpha != 0.0f && GreenPrice == m_GreenSpellCost)
         {
             m_GreenCooldownText.alpha = 0.0f;
             UpdateUi(0, "Green");
@@ -130,7 +133,7 @@ public class UiComponents : MonoBehaviour
             m_RedCooldownText.text = $"{Mathf.Ceil(m_RedSpellElapsed)}";
             ChangeAlpha(m_RedCrystalImage, 0.2f);
         }
-        else if (m_RedCooldownText.alpha != 0.0f && RedPrice == spellsCost)
+        else if (m_RedCooldownText.alpha != 0.0f && RedPrice == m_RedSpellCost)
         {
             m_RedCooldownText.alpha = 0.0f;
             UpdateUi(0, "Red");
@@ -150,10 +153,11 @@ public class UiComponents : MonoBehaviour
         {
             case "Blue":
                 m_BlueCrystalsText.text = crystalAmount.ToString();
-                if (crystalAmount >= BluePrice)
+                if (!LevelManager.instance.GetSpellUnlocked("Blue")) break;
+                if (crystalAmount >= m_BlueSpellCost)
                 {
                     ChangeAlpha(m_BlueCrystalImage, 1.0f);
-                    if (BluePrice == unlockPrice) BluePrice = spellsCost;
+                    m_BlueInputText.alpha = 1.0f;
                     LevelManager.instance.SetSpellAvailable("Blue", true);
                 }
                 else
@@ -165,10 +169,12 @@ public class UiComponents : MonoBehaviour
                 break;
             case "Yellow":
                 m_YellowCrystalsText.text = crystalAmount.ToString();
+                if (!LevelManager.instance.GetSpellUnlocked("Yellow")) break;
                 if (crystalAmount >= YellowPrice)
                 {
                     ChangeAlpha(m_YellowCrystalImage, 1.0f);
-                    if (YellowPrice == unlockPrice) YellowPrice = spellsCost;
+                    m_YellowInputText.alpha = 1.0f;
+                    if (YellowPrice == unlockPrice) YellowPrice = m_YellowSpellCost;
                     LevelManager.instance.SetSpellAvailable("Yellow", true);
                 }
                 else
@@ -180,10 +186,12 @@ public class UiComponents : MonoBehaviour
                 break;
             case "Green":
                 m_GreenCrystalsText.text = crystalAmount.ToString();
+                if (!LevelManager.instance.GetSpellUnlocked("Green")) break;
                 if (crystalAmount >= GreenPrice)
                 {
                     ChangeAlpha(m_GreenCrystalImage, 1.0f);
-                    if (GreenPrice == unlockPrice) GreenPrice = spellsCost;
+                    m_GreenInputText.alpha = 1.0f;
+                    if (GreenPrice == unlockPrice) GreenPrice = m_GreenSpellCost;
                     LevelManager.instance.SetSpellAvailable("Green", true);
                 }
                 else
@@ -195,10 +203,12 @@ public class UiComponents : MonoBehaviour
                 break;
             case "Red":
                 m_RedCrystalsText.text = crystalAmount.ToString();
+                if (!LevelManager.instance.GetSpellUnlocked("Red")) break;
                 if (crystalAmount >= RedPrice)
                 {
                     ChangeAlpha(m_RedCrystalImage, 1.0f);
-                    if (RedPrice == unlockPrice) RedPrice = spellsCost;
+                    m_RedInputText.alpha = 1.0f;
+                    if (RedPrice == unlockPrice) RedPrice = m_RedSpellCost;
                     LevelManager.instance.SetSpellAvailable("Red", true);
                 }
                 else
@@ -223,8 +233,6 @@ public class UiComponents : MonoBehaviour
         switch (_color)
         {
             case "Blue":
-                m_BlueCooldownText.alpha = 1.0f;
-                m_BlueSpellElapsed = m_BlueSpellTimer;
                 break;
             case "Green":
                 m_GreenCooldownText.alpha = 1.0f;

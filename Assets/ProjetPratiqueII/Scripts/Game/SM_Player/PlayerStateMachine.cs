@@ -87,10 +87,10 @@ public class PlayerStateMachine : MonoBehaviour
     [HideInInspector] public bool m_AimingRed;
     [HideInInspector] public bool m_AimingYellow;
     [SerializeField] public Vector3 m_AimOffset;
-    [SerializeField] public int m_BlueSpellCost;
-    [SerializeField] public int m_GreenSpellCost;
-    [SerializeField] public int m_RedSpellCost;
-    [SerializeField] public int m_YellowSpellCost;
+    private int m_BlueSpellCost;
+    private int m_GreenSpellCost;
+    private int m_RedSpellCost;
+    private int m_YellowSpellCost;
     [HideInInspector] public int unlockPrice;
 
     [Space]
@@ -131,6 +131,10 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void Init()
     {
+        m_BlueSpellCost = LevelManager.instance.m_BlueSpellCost;
+        m_GreenSpellCost = LevelManager.instance.m_GreenSpellCost;
+        m_RedSpellCost = LevelManager.instance.m_RedSpellCost;
+        m_YellowSpellCost = LevelManager.instance.m_YellowSpellCost;
         unlockPrice = LevelManager.instance.m_UnlockPrice;
         m_AimSphere.SetActive(false);
         m_AimingYellow = false;
@@ -164,6 +168,7 @@ public class PlayerStateMachine : MonoBehaviour
         LevelManager.instance.LastBiomeAction += TeleportLast;
         LevelManager.instance.NextAnimAction += TeleportNextAnim;
         LevelManager.instance.LastAnimAction += TeleportLastAnim;
+        LevelManager.instance.SpellUnlockAction += unlockSpell;
 
         SetState(new PlayerIdle(this));
     }
@@ -177,9 +182,9 @@ public class PlayerStateMachine : MonoBehaviour
     {
         if (LevelManager.instance.takeInput)
         {
+            SpellTimers();
             SpellsInput();
             SetInteraction();
-            SpellTimers();
         }
 
         _currentState.UpdateExecute();
@@ -214,6 +219,10 @@ public class PlayerStateMachine : MonoBehaviour
                     m_StoppingDistance = m_MiningRange;
                     m_Destination = m_TargetCrystal.transform.position;
                     SetState(new PlayerMoving(this));
+                }
+                else if (m_TargetHit.collider.gameObject.layer == 12)
+                {
+                    LevelManager.instance.LevelUp();
                 }
                 else
                 {
@@ -364,7 +373,6 @@ public class PlayerStateMachine : MonoBehaviour
             {
                 if (LevelManager.instance.GetSpellAvailable("Yellow"))
                 {
-                    m_AimingYellow = true;
                     m_AimingYellow = !m_AimingYellow;
                     LevelManager.instance.ActiveAction("Yellow", m_AimingYellow);
                 }
@@ -382,22 +390,18 @@ public class PlayerStateMachine : MonoBehaviour
         {
             case "Blue":
                 m_BlueSpell = true;
-                LevelManager.instance.CollectAction?.Invoke(-unlockPrice, "Blue");
                 break;
             case "Green":
                 m_GreenSpell = true;
-                LevelManager.instance.CollectAction?.Invoke(-unlockPrice, "Green");
                 m_RegenerateAmount = m_MaxRegenerateAmount;
                 break;
             case "Yellow":
                 m_YellowSpell = true;
-                LevelManager.instance.CollectAction?.Invoke(-unlockPrice, "Yellow");
                 LevelManager.instance.SetPlayerDamage(m_MaxDamage);
 
                 break;
             case "Red":
                 m_RedSpell = true;
-                LevelManager.instance.CollectAction?.Invoke(-unlockPrice, "Red");
                 m_HealthCapacity = m_MaxHealth;
                 m_Hp += 50.0f;
                 break;

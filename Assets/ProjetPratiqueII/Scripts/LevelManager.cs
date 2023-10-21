@@ -25,6 +25,7 @@ public class LevelManager : MonoBehaviour
     public Action<string> ErrorAction;
     public Action<float> RedSpellAction;
     public Action<string> SpellCastAction;
+    public Action<string> SpellUnlockAction;
     public Action<string, bool> ActiveAction;
     public Action<Biome> NextBiomeAction;
     public Action<Biome> LastBiomeAction;
@@ -35,11 +36,15 @@ public class LevelManager : MonoBehaviour
     private bool m_YellowSpellAvailable;
     private bool m_GreenSpellAvailable;
     private bool m_RedSpellAvailable;
+    
+    private bool m_BlueSpellUnlocked;
+    private bool m_YellowSpellUnlocked;
+    private bool m_GreenSpellUnlocked;
+    private bool m_RedSpellUnlocked;
 
     private ObjPool m_Pools;
 
     public int m_UnlockPrice;
-    public int m_SpellsCost;
 
     public bool playerGodmode;
 
@@ -55,6 +60,13 @@ public class LevelManager : MonoBehaviour
 
     public bool inSequence;
     public bool takeInput;
+    
+    public int m_BlueSpellCost;
+    public int m_GreenSpellCost;
+    public int m_RedSpellCost;
+    public int m_YellowSpellCost;
+    
+    private int m_Steps;
 
     private Camera m_MainCamera;
 
@@ -90,6 +102,7 @@ public class LevelManager : MonoBehaviour
 
     public void LoadLevel()
     {
+        m_Steps = 0;
         m_MainCamera = Camera.main;
         inSequence = false;
         takeInput = true;
@@ -103,6 +116,12 @@ public class LevelManager : MonoBehaviour
         m_YellowSpellAvailable = false;
         m_GreenSpellAvailable = false;
         m_RedSpellAvailable = false;
+        
+        m_BlueSpellUnlocked = false;
+        m_YellowSpellUnlocked = false;
+        m_GreenSpellUnlocked = false;
+        m_RedSpellUnlocked = false;
+        
         m_GreenCollected = 0;
         m_RedCollected = 0;
         m_YellowCollected = 0;
@@ -120,6 +139,7 @@ public class LevelManager : MonoBehaviour
             WorldObjects.Add(Worlds[i].name, obj);
             if (i != 0) obj.SetActive(false);
         }
+        // AudioManager.instance.PlayMusic(MusicClip.Ice, 1.0f); 
     }
 
     public GameObject SpawnObj(string _tag, Vector3 _position, Quaternion _rotation)
@@ -282,6 +302,7 @@ public class LevelManager : MonoBehaviour
 
     public void GoNextBiome()
     {
+        // AudioManager.instance.StopMusic();
         inSequence = true;
         int biomeIndex = GetBiomeIndex();
         string nextBiomeName = Worlds[biomeIndex+1].name;
@@ -291,10 +312,12 @@ public class LevelManager : MonoBehaviour
         m_MainCamera.transform.position = Worlds[biomeIndex + 1].entrancePosition + new Vector3(0, 2, 0) - m_MainCamera.GetComponent<CameraFollow>().GetOffset();
         WorldObjects[currentWorld].SetActive(false);
         currentWorld = Worlds[biomeIndex + 1].name;
+        // AudioManager.instance.PlayMusic((MusicClip)biomeIndex + 1, 1.0f);
     }
     
     public void GoLastBiome()
     {
+        // AudioManager.instance.StopMusic();
         inSequence = true;
         int biomeIndex = GetBiomeIndex();
         string nextBiomeName = Worlds[biomeIndex-1].name;
@@ -304,6 +327,7 @@ public class LevelManager : MonoBehaviour
         m_MainCamera.transform.position = Worlds[biomeIndex - 1].exitPosition + new Vector3(0, 2, 0) - m_MainCamera.GetComponent<CameraFollow>().GetOffset();
         WorldObjects[currentWorld].SetActive(false);
         currentWorld = Worlds[biomeIndex - 1].name;
+        // AudioManager.instance.PlayMusic((MusicClip)biomeIndex - 1, 1.0f);
     }
 
     public void UnlockBiome()
@@ -314,6 +338,75 @@ public class LevelManager : MonoBehaviour
             {
                 barrage.SetActive(false);
                 break;
+            }
+        }
+    }
+
+    public bool GetSpellUnlocked(string _color)
+    {
+        switch (_color)
+        {
+            case "Blue":
+                return m_BlueSpellUnlocked;
+            case "Yellow":
+                return m_YellowSpellUnlocked;
+            case "Green":
+                return m_GreenSpellUnlocked;
+            case "Red":
+                return m_RedSpellUnlocked;
+        }
+
+        return false;
+    }
+    
+    public void LevelUp()
+    {
+        if (m_Steps == 0)
+        {
+            m_BlueSpellUnlocked = true;
+            CollectAction?.Invoke(20, "Blue");
+            m_Steps++;
+        }
+        else if (m_Steps == 1)
+        {
+            if (m_BlueCollected >= 300)
+            {
+                CollectAction?.Invoke(-300, "Blue");
+                SpellUnlockAction("Green");
+                Blockades[0].SetActive(false);
+                m_Steps++;
+            }
+        }
+        else if (m_Steps == 2)
+        {
+            if (m_GreenCollected >= 300)
+            {
+                m_GreenSpellUnlocked = true;
+                CollectAction?.Invoke(-300, "Green");
+                SpellUnlockAction("Red");
+                Blockades[1].SetActive(false);
+                m_Steps++;
+            }
+        }
+        else if (m_Steps == 3)
+        {
+            if (m_RedCollected >= 300)
+            {
+                m_RedSpellUnlocked = true;
+                CollectAction?.Invoke(-300, "Red");
+                SpellUnlockAction("Yellow");
+                Blockades[2].SetActive(false);
+                m_Steps++;
+            }
+        }
+        else if (m_Steps == 4)
+        {
+            if (m_YellowCollected >= 300)
+            {
+                m_YellowSpellUnlocked = true;
+                CollectAction?.Invoke(-300, "Yellow");
+                Blockades[3].SetActive(false);
+                m_Steps++;
             }
         }
     }
