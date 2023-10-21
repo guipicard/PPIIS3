@@ -1,12 +1,17 @@
 # Projet_Pratique_H2023
 
-click droit pour se deplacer et interagir.
-les spells se debloquent avec 300 crystaux et coutent 50 a caster par la suite.
+Audiomanager et audio pool présent sans son implementé
+manque le boss, la narative, le tutoriel, la mort et la musique.
+le jeu est très complet:
 
-avoir les 4 spells debloque la porte
+cliquer (gauche) sur le png au spawn, il vous Donnera le premier spell pour vous défendre.
 
-https://en.wikipedia.org/wiki/Sawtooth_wave
-https://docs.unity3d.com/Packages/com.unity.splines@1.0/api/UnityEngine.Splines.BezierCurve.html
-https://www.youtube.com/watch?v=wvK6MNlmCCE&ab_channel=GabrielAguiarProd.
-https://www.youtube.com/watch?v=u9lOaPVtSqg&ab_channel=GabrielAguiarProd.
-https://www.youtube.com/watch?v=40m_HUENh3E&ab_channel=GabrielAguiarProd.
+cliquer droit sur le sol pour se déplacer, gauche sur un minerais pour le miner et appuyer sur 1 avec le surseur sur l'ennemi
+pour attaquer au coup de minerais bleu.
+
+ammasser 300 minerais bleu et cliquer (gauche) sur le png au spawn et il vous débloquera le chemin au prochain biome.
+
+faire de meme pour chaque nouveau minerais qui se trouve dans le nouveau monde.
+
+Cela augmentera votre puissance, vous donnera des nouveaux pouvoir et vous débloquera les prochaines étapes de votre aventure.
+
