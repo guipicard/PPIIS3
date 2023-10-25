@@ -36,7 +36,7 @@ public class LevelManager : MonoBehaviour
     private bool m_YellowSpellAvailable;
     private bool m_GreenSpellAvailable;
     private bool m_RedSpellAvailable;
-    
+
     private bool m_BlueSpellUnlocked;
     private bool m_YellowSpellUnlocked;
     private bool m_GreenSpellUnlocked;
@@ -60,12 +60,12 @@ public class LevelManager : MonoBehaviour
 
     public bool inSequence;
     public bool takeInput;
-    
+
     public int m_BlueSpellCost;
     public int m_GreenSpellCost;
     public int m_RedSpellCost;
     public int m_YellowSpellCost;
-    
+
     private int m_Steps;
 
     private Camera m_MainCamera;
@@ -116,12 +116,12 @@ public class LevelManager : MonoBehaviour
         m_YellowSpellAvailable = false;
         m_GreenSpellAvailable = false;
         m_RedSpellAvailable = false;
-        
+
         m_BlueSpellUnlocked = false;
         m_YellowSpellUnlocked = false;
         m_GreenSpellUnlocked = false;
         m_RedSpellUnlocked = false;
-        
+
         m_GreenCollected = 0;
         m_RedCollected = 0;
         m_YellowCollected = 0;
@@ -188,7 +188,7 @@ public class LevelManager : MonoBehaviour
             case "Blue":
                 return m_BlueCollected;
         }
-        
+
         return 0;
     }
 
@@ -283,6 +283,7 @@ public class LevelManager : MonoBehaviour
                 break;
             }
         }
+
         return index;
     }
 
@@ -292,7 +293,7 @@ public class LevelManager : MonoBehaviour
         int biomeIndex = GetBiomeIndex();
         NextAnimAction?.Invoke(Worlds[biomeIndex]);
     }
-    
+
     public void AnimLastBiome()
     {
         takeInput = false;
@@ -305,26 +306,28 @@ public class LevelManager : MonoBehaviour
         // AudioManager.instance.StopMusic();
         inSequence = true;
         int biomeIndex = GetBiomeIndex();
-        string nextBiomeName = Worlds[biomeIndex+1].name;
+        string nextBiomeName = Worlds[biomeIndex + 1].name;
         WorldObjects[nextBiomeName].SetActive(true);
         NextBiomeAction?.Invoke(Worlds[biomeIndex + 1]);
 
-        m_MainCamera.transform.position = Worlds[biomeIndex + 1].entrancePosition + new Vector3(0, 2, 0) - m_MainCamera.GetComponent<CameraFollow>().GetOffset();
+        m_MainCamera.transform.position = Worlds[biomeIndex + 1].entrancePosition + new Vector3(0, 2, 0) -
+                                          m_MainCamera.GetComponent<CameraFollow>().GetOffset();
         WorldObjects[currentWorld].SetActive(false);
         currentWorld = Worlds[biomeIndex + 1].name;
         // AudioManager.instance.PlayMusic((MusicClip)biomeIndex + 1, 1.0f);
     }
-    
+
     public void GoLastBiome()
     {
         // AudioManager.instance.StopMusic();
         inSequence = true;
         int biomeIndex = GetBiomeIndex();
-        string nextBiomeName = Worlds[biomeIndex-1].name;
+        string nextBiomeName = Worlds[biomeIndex - 1].name;
         WorldObjects[nextBiomeName].SetActive(true);
-        LastBiomeAction?.Invoke(Worlds[biomeIndex-1]);
-        
-        m_MainCamera.transform.position = Worlds[biomeIndex - 1].exitPosition + new Vector3(0, 2, 0) - m_MainCamera.GetComponent<CameraFollow>().GetOffset();
+        LastBiomeAction?.Invoke(Worlds[biomeIndex - 1]);
+
+        m_MainCamera.transform.position = Worlds[biomeIndex - 1].exitPosition + new Vector3(0, 2, 0) -
+                                          m_MainCamera.GetComponent<CameraFollow>().GetOffset();
         WorldObjects[currentWorld].SetActive(false);
         currentWorld = Worlds[biomeIndex - 1].name;
         // AudioManager.instance.PlayMusic((MusicClip)biomeIndex - 1, 1.0f);
@@ -358,7 +361,7 @@ public class LevelManager : MonoBehaviour
 
         return false;
     }
-    
+
     public void LevelUp()
     {
         if (m_Steps == 0)

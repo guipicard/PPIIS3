@@ -107,7 +107,6 @@ public abstract class PlayerState
         m_AttackRange = _stateMachine.m_AttackRange;
         m_BulletSpawner = _stateMachine.m_BulletSpawner;
         m_DamageTag = _stateMachine.m_DamageTag;
-        m_BossDoor = _stateMachine.m_BossDoor;
         m_HealthBar = _stateMachine.m_HealthBar;
         m_HealthBarOffset = _stateMachine.m_HealthBarOffset;
         m_AimSphere = _stateMachine.m_AimSphere;

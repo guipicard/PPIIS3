@@ -24,7 +24,7 @@ public class ObjPool : MonoBehaviour
         // Init();
         SceneManager.sceneLoaded += Init;
     }
-
+    
     private void OnDestroy()
     {
         SceneManager.sceneLoaded -= Init;
