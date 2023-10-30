@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Lava
   m_EditorClassIdentifier: 
   name: Lava
-  entrancePosition: {x: 173.9, y: 0, z: -21.85}
+  entrancePosition: {x: 176.52, y: 0, z: -21.85}
   entranceRotation: {x: 0, y: -90, z: 0}
-  exitPosition: {x: 127.42, y: 0.071, z: -5.91}
+  exitPosition: {x: 125.4, y: 0.071, z: -5.91}
   exitRotation: {x: 0, y: 90, z: 0}
   StartRoad: {x: 195.94, y: 0, z: -21.85}
   EndRoad: {x: 105.68, y: 0.071, z: -5.91}

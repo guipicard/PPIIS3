@@ -38,6 +38,6 @@ public class PlayerBasicAttack : PlayerState
     {
         // LevelManager.instance.SetTarget(m_TargetEnemy);
         GameObject bullet =  LevelManager.instance.SpawnObj("Player_Bullet", m_BulletSpawner.position, m_BulletSpawner.transform.rotation);
-        bullet.GetComponent<PlayerBullet>().SetTarget(m_TargetEnemy, m_BulletSpawner.transform.position);
+        bullet.GetComponent<PlayerBullet>().SetTarget(m_TargetEnemy, m_BulletSpawner.transform.position, m_Transform);
     }
 }

@@ -40,6 +40,10 @@ public class AiAttack : AiState
     public override void UpdateExecute()
     {
         m_PlayerDistance = Vector3.Distance(player.transform.position, m_Transform.position);
+        if (m_PlayerDistance > m_TriggerDistance)
+        {
+            _AiStateMachine.TargetLost();
+        }
         switch (m_BulletTag)
         {
             case "Green_Bullet":

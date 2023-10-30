@@ -1,13 +1,13 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
-using RuntimeInspectorNamespace;
 using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
     [SerializeField] private Transform m_Player;
     [SerializeField] private Vector3 m_Offset;
+    [SerializeField] private float m_Speed;
 
     private Vector3 m_Position;
     private float m_PosY;
@@ -16,6 +16,11 @@ public class CameraFollow : MonoBehaviour
     {
         m_Position = m_Player.position + new Vector3(0, 2, 0);
         m_PosY = 0;
+        m_Position = m_Player.position + new Vector3(0, 2, 0) - m_Offset;
+        m_Position.y = m_PosY - m_Offset.y;
+        transform.position = Vector3.Lerp(transform.position, m_Position, Time.deltaTime * m_Speed);
+        m_Position += m_Offset;
+        transform.LookAt(m_Position + new Vector3(0, 2, 0));
     }
 
     void Update()
@@ -28,9 +33,8 @@ public class CameraFollow : MonoBehaviour
         {
             m_Position = m_Player.position + new Vector3(0, 2, 0) - m_Offset;
             m_Position.y = m_PosY - m_Offset.y;
-            transform.position = m_Position;
+            transform.position = Vector3.Lerp(transform.position, m_Position, Time.deltaTime * m_Speed);
             m_Position += m_Offset;
-            transform.LookAt(m_Position + new Vector3(0, 2, 0));
         }
     }
 

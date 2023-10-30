@@ -1,5 +1,6 @@
 using System.Collections;
 using System.Collections.Generic;
+using UnityEditor;
 using UnityEditorInternal;
 using UnityEngine;
 
@@ -31,9 +32,15 @@ public class AiMoving : AiState
 
         if (m_PlayerDistance > m_TriggerDistance)
         {
-            _AiStateMachine.SetState(new AiIdle(_AiStateMachine));
+            if (Vector3.Distance(m_Transform.position, m_SpawnPos) < 2.0f)
+            {
+                _AiStateMachine.SetState(new AiIdle(_AiStateMachine));
+            }
+            m_Transform.LookAt(m_SpawnPos);
+            return;
         }
-        else if (m_PlayerDistance > m_attackDistance)
+        
+        if (m_PlayerDistance > m_attackDistance)
         {
             m_Animator.SetInteger(moveState, 1);
             m_NavmeshAgent.destination = playerPosition;
@@ -42,9 +49,11 @@ public class AiMoving : AiState
         {
             Vector3 direction;
             Vector3 pointAtSafeDistance;
-            m_BackRay = new Ray(m_Transform.position, -m_Transform.forward);
-            m_LeftRay = new Ray(m_Transform.position, -m_Transform.right);
-            m_RightRay = new Ray(m_Transform.position, m_Transform.right);
+            Vector3 pos = m_Transform.position;
+            var right = m_Transform.right;
+            m_BackRay = new Ray(pos, -m_Transform.forward);
+            m_LeftRay = new Ray(pos, -right);
+            m_RightRay = new Ray(pos, right);
             if (Physics.Raycast(m_LeftRay, out m_LeftHit, 4.0f))
             {
                 m_Animator.SetInteger(moveState, 4);
@@ -78,7 +87,6 @@ public class AiMoving : AiState
             }
             m_NavmeshAgent.destination = pointAtSafeDistance;
         }
-
         m_Transform.LookAt(playerPosition);
     }
 

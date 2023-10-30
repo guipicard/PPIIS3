@@ -32,6 +32,7 @@ public abstract class AiState
     private bool m_IsStabbing;
     private bool m_OutOfRange;
     private Outline m_OutlineScript;
+    protected Vector3 m_SpawnPos;
     
     protected static readonly int running = Animator.StringToHash("Running");
     protected static readonly int combat = Animator.StringToHash("Combat");
@@ -69,6 +70,7 @@ public abstract class AiState
         m_Cooldown = _stateMachine.m_Cooldown;
         m_Hp = _stateMachine.m_Hp;
         m_SafeDistance = _stateMachine.m_SafeDistance;
+        m_SpawnPos = _stateMachine.m_SpawnPos;
     }
 
     private void LoadComponents(AIStateMachine _stateMachine)

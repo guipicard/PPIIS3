@@ -37,7 +37,7 @@ public class CrystalsBehaviour : MonoBehaviour
         }
 
         CrystalSpacing = LevelManager.instance.m_CrystalSpaceBetween;
-        m_CrystalHeight = m_InitialPositions[0].y;
+        m_CrystalHeight = 0.0f;
         m_SurroundOffsets = new Vector2[4]
         {
             new Vector2(CrystalSpacing, CrystalSpacing),
@@ -76,7 +76,7 @@ public class CrystalsBehaviour : MonoBehaviour
         
         if (m_Elapsed > LevelManager.instance.m_CrystalSpawnTimer && m_Biome == LevelManager.instance.currentWorld)
         {
-            m_AiActive = LevelManager.instance.GetActiveInScene(m_AiTag).Count;
+            m_AiActive = GetAiCount();
             m_CrystalActive = LevelManager.instance.UpdateCrystalNums(m_CrystalTag);
             FillCrystalList();
             GetNewPositions();
@@ -106,6 +106,7 @@ public class CrystalsBehaviour : MonoBehaviour
 
         foreach (GameObject crystal in LevelManager.instance.GetActiveInScene(m_CrystalTag))
         {
+            if (crystal.GetComponent<CrystalEvents>().m_Biome != LevelManager.instance.currentWorld) continue;
             m_CrystalsPosition.Add(new Vector2(crystal.transform.position.x, crystal.transform.position.z));
         }
     }
@@ -120,7 +121,7 @@ public class CrystalsBehaviour : MonoBehaviour
             {
                 Vector2 m_currentPosition = m_SurroundOffsets[j] + pos;
 
-                m_Ray.origin = new Vector3(m_currentPosition.x, m_CrystalHeight + 2.0f, m_currentPosition.y);
+                m_Ray.origin = new Vector3(m_currentPosition.x, m_CrystalHeight + 5.0f, m_currentPosition.y);
                 if (Physics.Raycast(m_Ray, out m_HitInfo, Mathf.Infinity))
                 {
                     if (m_HitInfo.collider.gameObject.layer == 8 || m_HitInfo.collider.gameObject.layer == 6)
@@ -185,7 +186,7 @@ public class CrystalsBehaviour : MonoBehaviour
             crystalList = m_LastCrystalWave;
         }
 
-        bool aiCap = LevelManager.instance.GetActiveInScene(m_AiTag).Count > 10;
+        bool aiCap = GetAiCount() > 10;
         bool enoughCrystals = crystalList.Count < (6 / m_InitialPositions.Count);
         if (aiCap || enoughCrystals) return;
 
@@ -195,5 +196,19 @@ public class CrystalsBehaviour : MonoBehaviour
         Vector2 spawnPointAi = spawnPointCrystal - spawnPointOffset;
         Vector3 newAiPosition = new Vector3(spawnPointAi.x, m_CrystalHeight, spawnPointAi.y);
         LevelManager.instance.SpawnObj(m_AiTag, newAiPosition, Quaternion.identity);
+    }
+
+    private int GetAiCount()
+    {
+        int result = 0;
+        foreach (GameObject ai in LevelManager.instance.GetActiveInScene(m_AiTag))
+        {
+            if (ai.GetComponent<AIStateMachine>().m_Biome == LevelManager.instance.currentWorld)
+            {
+                result++;
+            }
+        }
+
+        return result;
     }
 }

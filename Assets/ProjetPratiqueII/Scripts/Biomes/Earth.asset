@@ -13,9 +13,9 @@ MonoBehaviour:
   m_Name: Earth
   m_EditorClassIdentifier: 
   name: Earth
-  entrancePosition: {x: -25.934032, y: 0, z: 20.41}
+  entrancePosition: {x: -26.04, y: 0, z: 23.01}
   entranceRotation: {x: 0, y: 180, z: 0}
-  exitPosition: {x: 7.165987, y: 0, z: -24.45}
+  exitPosition: {x: 7.04, y: 0, z: -27.99}
   exitRotation: {x: 0, y: 0, z: 0}
   StartRoad: {x: -25.934032, y: 0, z: 42.06}
   EndRoad: {x: 7.165987, y: 0, z: -47.66}

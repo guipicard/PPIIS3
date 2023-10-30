@@ -15,16 +15,10 @@ public class HelthBarFollow : MonoBehaviour
         
     }
 
-    // Update is called once per frame
-    void Update()
-    {
-    }
-
     private void FixedUpdate()
     {
         Vector3 playerPosition = player.position;
         Vector3 targetPosition = playerPosition + m_HealthBarOffset;
         transform.position = Vector3.Lerp(playerPosition, targetPosition, Time.deltaTime * m_Speed);
-        transform.LookAt(mainCamera.transform.position);
     }
 }

@@ -66,6 +66,7 @@ public class UiComponents : MonoBehaviour
         LevelManager.instance.CollectAction += UpdateUi;
         LevelManager.instance.SpellCastAction += TriggerSpell;
         LevelManager.instance.ActiveAction += ActivateSpell;
+        LevelManager.instance.SpellUnlockAction += UnlockSpell;
 
         ChangeAlpha(m_BlueCrystalImage, 0.0f);
         ChangeAlpha(m_GreenCrystalImage, 0.0f);
@@ -174,7 +175,6 @@ public class UiComponents : MonoBehaviour
                 {
                     ChangeAlpha(m_YellowCrystalImage, 1.0f);
                     m_YellowInputText.alpha = 1.0f;
-                    if (YellowPrice == unlockPrice) YellowPrice = m_YellowSpellCost;
                     LevelManager.instance.SetSpellAvailable("Yellow", true);
                 }
                 else
@@ -191,7 +191,6 @@ public class UiComponents : MonoBehaviour
                 {
                     ChangeAlpha(m_GreenCrystalImage, 1.0f);
                     m_GreenInputText.alpha = 1.0f;
-                    if (GreenPrice == unlockPrice) GreenPrice = m_GreenSpellCost;
                     LevelManager.instance.SetSpellAvailable("Green", true);
                 }
                 else
@@ -208,7 +207,6 @@ public class UiComponents : MonoBehaviour
                 {
                     ChangeAlpha(m_RedCrystalImage, 1.0f);
                     m_RedInputText.alpha = 1.0f;
-                    if (RedPrice == unlockPrice) RedPrice = m_RedSpellCost;
                     LevelManager.instance.SetSpellAvailable("Red", true);
                 }
                 else
@@ -271,6 +269,26 @@ public class UiComponents : MonoBehaviour
         Vector2 m_rect = img.rectTransform.anchoredPosition;
         m_rect.y += _state ? m_ActiveHeight : -m_ActiveHeight;
         img.rectTransform.anchoredPosition = m_rect;
+    }
+
+    private void UnlockSpell(string _color)
+    {
+        Image img = m_BlueCrystalImage;
+        switch (_color)
+        {
+            case "Blue":
+                img = m_BlueCrystalImage;
+                break;
+            case "Green":
+                GreenPrice = m_GreenSpellCost;
+                break;
+            case "Yellow":
+                YellowPrice = m_YellowSpellCost;
+                break;
+            case "Red":
+                RedPrice = m_RedSpellCost;
+                break;
+        }
     }
 
     public void PauseToggle()

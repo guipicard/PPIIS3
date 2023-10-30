@@ -81,6 +81,10 @@ public abstract class PlayerState
     protected static readonly int Running = Animator.StringToHash("Running");
     protected static readonly int Attack = Animator.StringToHash("Attack");
     protected static readonly int MineAnim = Animator.StringToHash("MineAnim");
+    
+    protected GameObject m_Lightning;
+    protected GameObject m_LightningRight;
+    protected GameObject m_LightningLeft;
 
 
     public PlayerState(PlayerStateMachine stateMachine)

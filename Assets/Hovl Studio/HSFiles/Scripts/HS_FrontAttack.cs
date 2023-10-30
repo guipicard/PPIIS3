@@ -1,6 +1,8 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using Random = UnityEngine.Random;
 
 public class HS_FrontAttack : MonoBehaviour
 {
@@ -26,13 +28,30 @@ public class HS_FrontAttack : MonoBehaviour
     public Animator[] anim;
     public float delay = 0f;
     public bool playMeshEffect;
+    // added by buki
+    private bool animStarted;
+
+    // start was added by Buki
+    private void Start()
+    {
+        startRotation = transform.eulerAngles;
+        animStarted = false;
+    }
 
     private void Update()
     {
         if (playMeshEffect == true)
         {
+            animStarted = true;
             StartCoroutine(MeshEffect());
             playMeshEffect = false;
+        }
+
+        if (ps.isStopped && animStarted == true)
+        {
+            // Destroy was added by Buki
+            Destroy(transform.parent.gameObject);
+            
         }
     }
 

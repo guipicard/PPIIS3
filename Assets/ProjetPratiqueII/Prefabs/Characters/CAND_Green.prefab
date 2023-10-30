@@ -766,6 +766,7 @@ MonoBehaviour:
   m_HealthBar: {fileID: 7161241771757313009}
   m_Cooldown: 1
   m_Hp: 100
+  m_MaxHp: 100
   m_SafeDistance: 6
   m_Rigidbody: {fileID: 0}
   m_NavmeshAgent: {fileID: 0}
@@ -778,6 +779,9 @@ MonoBehaviour:
   m_OutOfRange: 0
   m_CooldownElapsed: 0
   m_OutlineScript: {fileID: 0}
+  m_SpawnPos: {x: 0, y: 0, z: 0}
+  lostTime: 2
+  m_Biome: 
 --- !u!114 &-3591526618988660520
 MonoBehaviour:
   m_ObjectHideFlags: 0

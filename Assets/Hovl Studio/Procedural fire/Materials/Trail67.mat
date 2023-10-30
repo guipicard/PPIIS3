@@ -2,24 +2,69 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!21 &2100000
 Material:
-  serializedVersion: 6
+  serializedVersion: 8
   m_ObjectHideFlags: 0
-  m_PrefabParentObject: {fileID: 0}
-  m_PrefabInternal: {fileID: 0}
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
   m_Name: Trail67
-  m_Shader: {fileID: 4800000, guid: 1d4a9c916d62a324e90c32798caf3f13, type: 3}
-  m_ShaderKeywords: 
+  m_Shader: {fileID: -6465566751694194690, guid: 97ae18f56456e864badd6796dec2d5a7, type: 3}
+  m_Parent: {fileID: 0}
+  m_ModifiedSerializedProperties: 0
+  m_ValidKeywords: []
+  m_InvalidKeywords: []
   m_LightmapFlags: 4
   m_EnableInstancingVariants: 0
   m_DoubleSidedGI: 0
   m_CustomRenderQueue: -1
   stringTagMap: {}
   disabledShaderPasses: []
+  m_LockedProperties: 
   m_SavedProperties:
     serializedVersion: 3
     m_TexEnvs:
+    - _Dissolvenoise:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Flow:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _FlowMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
     - _MainTex:
         m_Texture: {fileID: 2800000, guid: c4f655f5d01f55547a23a546b58afd04, type: 3}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _MainTexture:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Mask:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Noise:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _NormalMap:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Tex1:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _Tex2:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - _TextureNoise:
+        m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
     - _TextureSample0:
@@ -34,15 +79,103 @@ Material:
         m_Texture: {fileID: 0}
         m_Scale: {x: 1, y: 1}
         m_Offset: {x: 0, y: 0}
+    - unity_Lightmaps:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_LightmapsInd:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    - unity_ShadowMasks:
+        m_Texture: {fileID: 0}
+        m_Scale: {x: 1, y: 1}
+        m_Offset: {x: 0, y: 0}
+    m_Ints: []
     m_Floats:
     - _Amplitude: 0
+    - _BackFresnel: -2
+    - _BackFresnelEmission: 1
+    - _Blend2: 1
+    - _ColorPosition: 0.35
+    - _CullMode: 0
+    - _Cutoff: 0.5
+    - _Depth: 0.15
     - _Depthpower: 1
+    - _Dissolveamount: 0.332
+    - _Distortionpower: 0.2
     - _Emission: 5
+    - _FlowStrength: 0.1
     - _Frequency: 10
+    - _Fresnel: 1
+    - _FresnelEmission: 1
+    - _FresnelPower: 6
+    - _FresnelScale: 1
+    - _Fresnelpower: 3
+    - _Fresnelscale: 3
+    - _InvFade: 1
+    - _LenghtSet1ifyouuseinPS: 0
+    - _LightEmission: 2
+    - _LightFalloff: 0.5
+    - _LightRange: 2
+    - _Metallic: 0
+    - _Movenoise: 1
     - _Opacity: 1
+    - _PathSet0ifyouuseinPS: 0
+    - _QueueControl: 0
+    - _QueueOffset: 0
+    - _SeparateEmission: 2
+    - _SeparateFresnel: 0
+    - _ShinnySpeed: 30
+    - _Sideopacity: 0
+    - _Smoothness: 0.2
     - _StartFrequency: 0
+    - _UFlowSpeed: 4
+    - _UseBackFresnel: 1
+    - _UseCustomData: 0
+    - _UseFresnel: 1
+    - _UseShinny: 0
     - _Useblack: 0
+    - _Usecenterglow: 0
+    - _Usecustomrandom: 0
     - _Usedepth: 0
+    - _Useonlycolor: 0
+    - _Usesmoothcorners: 0
+    - _Usetexturecolor: 0
+    - _Usetexturedissolve: 0
+    - _VFlowSpeed: 2
     - __dirty: 1
     m_Colors:
+    - _BackFacesColor: {r: 0, g: 0.02397324, b: 0.509434, a: 1}
+    - _BackFresnelColor: {r: 0.35686278, g: 0.08627448, b: 0.08627448, a: 1}
     - _Color: {r: 1, g: 1, b: 1, a: 1}
+    - _Color1: {r: 1, g: 0.5423228, b: 0, a: 1}
+    - _Color2: {r: 1, g: 0, b: 0, a: 1}
+    - _Dissolvecolor: {r: 1, g: 1, b: 1, a: 1}
+    - _DissolvespeedXY: {r: 0, g: 0, b: 0, a: 0}
+    - _DistortionSpeedXYPowerZ: {r: 0, g: 0, b: 0, a: 0}
+    - _FresnelColor: {r: 0.35686278, g: 0.08627448, b: 0.08627448, a: 1}
+    - _FrontFacesColor: {r: 0, g: 0.23137257, b: 1, a: 1}
+    - _Maincolor: {r: 0.76094687, g: 0.8547776, b: 0.9433962, a: 1}
+    - _Noisecolor: {r: 0.24705875, g: 0.30123818, b: 0.36078426, a: 1}
+    - _NoisespeedXYEmissonZPowerW: {r: 0.5, g: 0, b: 2, a: 1}
+    - _RemapXYFresnelZW: {r: -10, g: 10, b: 2, a: 2}
+    - _Speed: {r: 0.189, g: 0.225, b: -0.2, a: -0.05}
+    - _SpeedMainTexUVNoiseZW: {r: 0, g: 0, b: 0, a: 0}
+    - _SpeedTex1: {r: 0, g: 0, b: 0, a: 0}
+    - _SpeedTex2XYEmission: {r: 0, g: 0, b: 0, a: 0}
+    - _UpColor: {r: 0.4575472, g: 0.7381514, b: 1, a: 1}
+  m_BuildTextureStacks: []
+--- !u!114 &4390707002239054960
+MonoBehaviour:
+  m_ObjectHideFlags: 11
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d0353a89b1f911e48b9e16bdc9f2e058, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  version: 7

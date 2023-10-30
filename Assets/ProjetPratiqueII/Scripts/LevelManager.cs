@@ -137,7 +137,8 @@ public class LevelManager : MonoBehaviour
         {
             GameObject obj = GameObject.Find(WorldObjectNames[i]);
             WorldObjects.Add(Worlds[i].name, obj);
-            if (i != 0) obj.SetActive(false);
+            bool active = i == 0;
+            obj.SetActive(active);
         }
         // AudioManager.instance.PlayMusic(MusicClip.Ice, 1.0f); 
     }

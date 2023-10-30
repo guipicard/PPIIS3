@@ -9,22 +9,13 @@ public class AiDenfending : AiState
         m_Animator.SetBool(running, false);
         m_Animator.SetInteger(moveState, 0);
         m_NavmeshAgent.destination = m_Transform.position;
-        //m_CooldownElapsed = 0.0f;
     }
 
     public override void UpdateExecute()
     {
         _AiStateMachine.IncrementCD();
         m_PlayerDistance = Vector3.Distance(player.transform.position, m_Transform.position);
-        //if (m_CooldownElapsed > m_Cooldown)
-        //{
-        //    _AiStateMachine.SetState(new AiAttack(_AiStateMachine));
-        //}
-
-        if (m_PlayerDistance > m_TriggerDistance)
-        {
-            _AiStateMachine.SetState(new AiIdle(_AiStateMachine));
-        }
+        
         if (m_PlayerDistance > m_attackDistance)
         {
             _AiStateMachine.SetState(new AiMoving(_AiStateMachine));

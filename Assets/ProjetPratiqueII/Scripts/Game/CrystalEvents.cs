@@ -11,11 +11,13 @@ public class CrystalEvents : MonoBehaviour
     private bool m_CanGetDestroyed;
     private CrystalsBehaviour m_CrystalsBehaviour;
     private Outline m_OutlineScript;
+    public string m_Biome;
     
     void Start()
     {
         m_CrystalsBehaviour = transform.parent.GetComponent<CrystalsBehaviour>();
         m_CanGetDestroyed = Vector3.Distance(transform.position, m_InitialPosition) > 9.0f;
+        m_Biome = LevelManager.instance.currentWorld;
     }
 
     private void OnEnable()

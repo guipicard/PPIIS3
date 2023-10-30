@@ -15,7 +15,7 @@ MonoBehaviour:
   name: Ice
   entrancePosition: {x: -203.42401, y: 0, z: -25.6129}
   entranceRotation: {x: 0, y: 45, z: 0}
-  exitPosition: {x: -158.28, y: 0, z: 0.57}
+  exitPosition: {x: -155.47, y: 0, z: 0.03}
   exitRotation: {x: 0, y: 270, z: 0}
   StartRoad: {x: 0, y: 0, z: 0}
   EndRoad: {x: -134.63, y: 0, z: 0.57}

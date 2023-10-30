@@ -1,4 +1,4 @@
-using System;
+ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,7 +6,12 @@ using Random = UnityEngine.Random;
 
 public class PlayerBullet : MonoBehaviour
 {
+    private Transform m_PlayerTransform;
+    
     [SerializeField] private float m_Speed;
+    [SerializeField] private float m_MaxSpeed;
+    [SerializeField] private int m_Angle1;
+    [SerializeField] private int m_Angle2;
     [SerializeField] private float m_StepTwoTime;
 
     private float m_Elapsed;
@@ -17,17 +22,25 @@ public class PlayerBullet : MonoBehaviour
 
     private Vector3 m_HeightOffset;
 
-    private Vector3 m_InitialTargetVelocity;
     private Rigidbody m_Rigidbody;
     private float m_InitialDistance;
 
+    private Vector3 m_InitialVelocity;
+    private Vector3 m_TargetVelocity;
     private Vector3 currentTargetPos;
+
+    private Vector3 m_PlayerInitialPos;
 
     private bool targetAlive;
 
     private void Awake()
     {
+        m_PlayerInitialPos = new Vector3();
+        m_PlayerTransform = null;
         m_Rigidbody = GetComponent<Rigidbody>();
+        m_InitialVelocity = new Vector3();
+        m_TargetVelocity = new Vector3();
+        currentTargetPos = new Vector3();
     }
 
     private void OnDisable()
@@ -40,41 +53,33 @@ public class PlayerBullet : MonoBehaviour
         m_Elapsed = 0.0f;
         targetAlive = true;
         transform.GetChild(0).GetComponent<TrailRenderer>().Clear();
+        // transform.GetChild(0).GetChild(0).GetComponent<TrailRenderer>().Clear();
+        
     }
 
     void Update()
     {
         m_Elapsed += Time.deltaTime;
         Vector3 currentPos = transform.position;
+        Vector3 playerVelocity = m_PlayerTransform.position;
         if (targetAlive) currentTargetPos = m_Target.transform.position + m_HeightOffset;
-        m_InitialDistance = Vector3.Distance(m_InitialPosition, currentTargetPos);
-
-        Vector3 newVelocity = (currentTargetPos - currentPos).normalized;
-
-        Vector3 IT = currentTargetPos - m_InitialPosition;
-        Vector3 IC = currentPos - m_InitialPosition;
-
-        Vector3 IT_norm = IC.normalized;
-
-        float distance = Vector3.Dot(IT_norm, IC);
-
-        distance = Mathf.Abs(distance);
-
-        float t = (m_InitialDistance - distance) / m_InitialDistance;
-        t = Mathf.Abs(t - 1);
-        if (t > 1.0f) t = 1.0f;
-        if (t < 0.0f) t = 0.0f;
-        float maxSpeed = 0.0f;
+        
         if (m_Elapsed > m_StepTwoTime)
         {
-            maxSpeed = m_Speed * 5.0f;
-            m_Rigidbody.velocity = newVelocity * maxSpeed;
+            m_TargetVelocity = (currentTargetPos - currentPos).normalized;
+            m_Rigidbody.velocity = m_TargetVelocity * m_MaxSpeed;
         }
         else
         {
-            maxSpeed = m_Speed;
-            m_Rigidbody.velocity = Vector3.Lerp(m_InitialTargetVelocity * maxSpeed, newVelocity * maxSpeed, t);
+            //
+            // Vector3 playerOffset = m_PlayerTransform.position - m_PlayerInitialPos;
+            // transform.gameObject.GetComponent<Rigidbody>().position = m_InitialPosition + playerOffset;
+            
+            Vector3 initial = playerVelocity.normalized + m_InitialVelocity * m_Speed;
+            Vector3 target = playerVelocity.normalized + m_TargetVelocity * m_Speed;
+            m_Rigidbody.velocity = Vector3.Lerp( initial, target, m_Elapsed / m_StepTwoTime);
         }
+            
 
         transform.LookAt(currentTargetPos);
 
@@ -101,20 +106,30 @@ public class PlayerBullet : MonoBehaviour
             }
             LevelManager.instance.ToggleInactive(gameObject);
         }
+
+        Transform sparks = transform.GetChild(1);
+        sparks.LookAt(transform.position + m_Rigidbody.velocity);
     }
 
-    public void SetTarget(GameObject _target, Vector3 _pos)
+    public void SetTarget(GameObject _target, Vector3 _pos, Transform _transform)
     {
         if (_target != null)
         {
+            m_PlayerTransform = _transform;
+            m_PlayerInitialPos = m_PlayerTransform.position;
             m_Target = _target;
             m_HeightOffset = new Vector3(0, 1.0f, 0);
             Vector3 targetPos = m_Target.transform.position + m_HeightOffset;
             m_InitialPosition = _pos;
-            m_InitialDistance = Mathf.Abs(Vector3.Distance(_pos, targetPos));
-            float x = Random.Range(-45, 45);
-            float y = 45 - Mathf.Abs(x);
-            m_InitialTargetVelocity = (targetPos - _pos + new Vector3(x, y, 0)).normalized;
+            int x1 = Random.Range(-m_Angle1, m_Angle1);
+            int y1 = m_Angle1 - Mathf.Abs(x1);
+            int x2 = m_Angle2 * x1 / m_Angle1;
+            int y2 = m_Angle2 * y1 / m_Angle1;
+            Vector3 direction = (targetPos - m_InitialPosition).normalized;
+            Vector3 offset1 = new Vector3(x1, y1, 0).normalized;
+            Vector3 offset2 = new Vector3(x2, y2, 0).normalized;
+            m_InitialVelocity = (-direction + offset1).normalized;
+            m_TargetVelocity = (direction + offset2).normalized;
         }
     }
 }

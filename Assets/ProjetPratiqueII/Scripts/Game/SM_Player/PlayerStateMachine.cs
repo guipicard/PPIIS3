@@ -51,6 +51,7 @@ public class PlayerStateMachine : MonoBehaviour
     [SerializeField] public float m_MaxDamage;
     [SerializeField] public float m_HealAmount;
     [SerializeField] public float m_RedSpellDamage;
+    private float m_FullHpElapsed;
 
     [Header("Timers")] // Timers 
     [HideInInspector]
@@ -84,6 +85,9 @@ public class PlayerStateMachine : MonoBehaviour
     [HideInInspector] public bool m_AimingRed;
     [HideInInspector] public bool m_AimingYellow;
     [SerializeField] public Vector3 m_AimOffset;
+    [SerializeField] public GameObject m_Lightning;
+    [SerializeField] public GameObject m_LightningRight;
+    [SerializeField] public GameObject m_LightningLeft;
     private int m_BlueSpellCost;
     private int m_GreenSpellCost;
     private int m_RedSpellCost;
@@ -137,6 +141,7 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void Init()
     {
+        m_FullHpElapsed = 0.0f;
         m_Suns = new Dictionary<string, GameObject>();
         for (int i = 0; i < m_SunsObj.Count; i++)
         {
@@ -165,8 +170,7 @@ public class PlayerStateMachine : MonoBehaviour
         m_Animator = GetComponent<Animator>();
         m_Transform = transform;
         m_Direction = Vector3.zero;
-        m_TargetRotation = transform.rotation;
-        m_MainCamera = Camera.main;
+        m_TargetRotation = m_Transform.rotation;
         m_HealthCapacity = m_MinHealth;
         m_Hp = m_MinHealth;
         m_RegenerateAmount = m_MinRegenerateAmount;
@@ -175,8 +179,8 @@ public class PlayerStateMachine : MonoBehaviour
         UpdateHealthBar();
         m_YellowSpellActive = false;
 
-        transform.position = LevelManager.instance.Worlds[0].entrancePosition;
-        transform.eulerAngles = LevelManager.instance.Worlds[0].entranceRotation;
+        m_Transform.position = LevelManager.instance.Worlds[0].entrancePosition;
+        m_Transform.eulerAngles = LevelManager.instance.Worlds[0].entranceRotation;
 
         LevelManager.instance.NextBiomeAction += TeleportNext;
         LevelManager.instance.LastBiomeAction += TeleportLast;
@@ -194,6 +198,11 @@ public class PlayerStateMachine : MonoBehaviour
 
     void Update()
     {
+        if (m_MainCamera == null)
+        {
+            m_MainCamera = Camera.main;
+            m_PlayerCanvas.transform.LookAt(m_MainCamera.transform.position);
+        }
         if (LevelManager.instance.takeInput)
         {
             SpellTimers();
@@ -208,6 +217,23 @@ public class PlayerStateMachine : MonoBehaviour
             if (m_HealingVFXElapsed > HealingVFX.GetComponent<ParticleSystem>().main.duration)
             {
                 HealingVFXObj.SetActive(false);
+            }
+        }
+        
+        if (m_Hp == m_HealthCapacity)
+        {
+            m_FullHpElapsed += Time.deltaTime;
+            if (m_FullHpElapsed > 2.0f)
+            {
+                Image sprite1 = m_HealthBar.transform.GetChild(0).GetComponent<Image>();
+                Image sprite2 = m_HealthBar.transform.GetChild(1).GetChild(0).GetComponent<Image>();
+                Color color1 = sprite1.color;
+                Color color2 = sprite2.color;
+                float alpha = Mathf.Lerp(1.0f, 0.0f, m_FullHpElapsed - 2.0f);
+                color1.a = alpha;
+                color2.a = alpha;
+                sprite1.color = color1;
+                sprite2.color = color2;
             }
         }
 
@@ -285,7 +311,7 @@ public class PlayerStateMachine : MonoBehaviour
         Vector3 bsPos = m_BulletSpawner.position;
         Quaternion bsRotation = m_BulletSpawner.rotation;
         GameObject bullet = LevelManager.instance.SpawnObj("Player_Bullet", bsPos, bsRotation);
-        bullet.GetComponent<PlayerBullet>().SetTarget(m_TargetEnemy, bsPos);
+        bullet.GetComponent<PlayerBullet>().SetTarget(m_TargetEnemy, bsPos, m_Transform);
     }
 
     private void UpdateHealthBar()
@@ -305,6 +331,17 @@ public class PlayerStateMachine : MonoBehaviour
 
             UpdateHealthBar();
             m_RegenerateElapsed = m_RegenerateTimer;
+            
+            Image sprite1 = m_HealthBar.transform.GetChild(0).GetComponent<Image>();
+            Image sprite2 = m_HealthBar.transform.GetChild(1).GetChild(0).GetComponent<Image>();
+            Color color1 = sprite1.color;
+            Color color2 = sprite2.color;
+            color1.a = 1.0f;
+            color2.a = 1.0f;
+            // float alpha = Mathf.Lerp(1.0f, 0.0f, m_FullHpElapsed - 2.0f);
+            sprite1.color = color1;
+            sprite2.color = color2;
+            m_FullHpElapsed = 0.0f;
         }
     }
 
@@ -560,6 +597,16 @@ public class PlayerStateMachine : MonoBehaviour
                 GameObject crystalObj = crystal.crystal;
                 foreach (var destination in crystal.next)
                 {
+                    GameObject lightning = Instantiate(m_Lightning);
+                    Transform lightningLeft = lightning.transform.GetChild(0);
+                    Transform lightningRight = lightning.transform.GetChild(1);
+                    lightningLeft.position = crystalObj.transform.position;
+                    lightningRight.position = destination.transform.position;
+                    lightningLeft.LookAt(lightningRight.position);
+                    
+                    HS_FrontAttack lightningScript = lightningLeft.gameObject.GetComponent<HS_FrontAttack>();
+                    lightningScript.playMeshEffect = true;
+                    
                     GameObject blueBall = Instantiate(m_BlueBall);
                     BlueBallBehaviour ballScript = blueBall.GetComponent<BlueBallBehaviour>();
                     ballScript.SetInitialPos(crystalObj.transform.position);
