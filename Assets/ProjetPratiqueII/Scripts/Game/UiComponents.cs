@@ -8,20 +8,20 @@ using UnityEngine.UI;
 
 public class UiComponents : MonoBehaviour
 {
-    [SerializeField] private TextMeshPro m_GreenCrystalsText;
-    [SerializeField] private TextMeshPro m_RedCrystalsText;
-    [SerializeField] private TextMeshPro m_YellowCrystalsText;
-    [SerializeField] private TextMeshPro m_BlueCrystalsText;
+    [SerializeField] private TextMeshProUGUI m_BlueCrystalsText;
+    [SerializeField] private TextMeshProUGUI m_GreenCrystalsText;
+    [SerializeField] private TextMeshProUGUI m_RedCrystalsText;
+    [SerializeField] private TextMeshProUGUI m_YellowCrystalsText;
 
     [SerializeField] private TextMeshProUGUI m_BlueCooldownText;
-    [SerializeField] private TextMeshProUGUI m_YellowCooldownText;
     [SerializeField] private TextMeshProUGUI m_GreenCooldownText;
     [SerializeField] private TextMeshProUGUI m_RedCooldownText;
+    [SerializeField] private TextMeshProUGUI m_YellowCooldownText;
 
-    [SerializeField] private TextMeshPro m_BlueInputText;
-    [SerializeField] private TextMeshPro m_YellowInputText;
-    [SerializeField] private TextMeshPro m_GreenInputText;
-    [SerializeField] private TextMeshPro m_RedInputText;
+    [SerializeField] private TextMeshProUGUI m_BlueInputText;
+    [SerializeField] private TextMeshProUGUI m_GreenInputText;
+    [SerializeField] private TextMeshProUGUI m_RedInputText;
+    [SerializeField] private TextMeshProUGUI m_YellowInputText;
     
     [SerializeField] private float m_YellowSpellTimer;
     [SerializeField] private float m_GreenSpellTimer;
@@ -31,10 +31,10 @@ public class UiComponents : MonoBehaviour
     private float m_GreenSpellElapsed;
     private float m_RedSpellElapsed;
 
+    [SerializeField] private Image m_BlueCrystalImage;
     [SerializeField] private Image m_GreenCrystalImage;
     [SerializeField] private Image m_RedCrystalImage;
     [SerializeField] private Image m_YellowCrystalImage;
-    [SerializeField] private Image m_BlueCrystalImage;
 
     [SerializeField] private float m_ActiveHeight;
 
