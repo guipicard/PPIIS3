@@ -14,13 +14,11 @@ public class CameraFollow : MonoBehaviour
 
     void Start()
     {
-        m_Position = m_Player.position + new Vector3(0, 2, 0);
-        m_PosY = 0;
-        m_Position = m_Player.position + new Vector3(0, 2, 0) - m_Offset;
-        m_Position.y = m_PosY - m_Offset.y;
-        transform.position = Vector3.Lerp(transform.position, m_Position, Time.deltaTime * m_Speed);
+        m_Position = m_Player.position + new Vector3(0, 1, 0) - m_Offset;
+        // m_Position.y = m_PosY - m_Offset.y;
+        transform.position = m_Position;
         m_Position += m_Offset;
-        transform.LookAt(m_Position + new Vector3(0, 2, 0));
+        transform.LookAt(m_Position);
     }
 
     void Update()
@@ -31,10 +29,10 @@ public class CameraFollow : MonoBehaviour
     {
         if (LevelManager.instance.takeInput)
         {
-            m_Position = m_Player.position + new Vector3(0, 2, 0) - m_Offset;
-            m_Position.y = m_PosY - m_Offset.y;
+            m_Position = m_Player.position + new Vector3(0, 1, 0) - m_Offset;
+            // m_Position.y = m_PosY - m_Offset.y;
+            m_Position.y = transform.position.y;
             transform.position = Vector3.Lerp(transform.position, m_Position, Time.deltaTime * m_Speed);
-            m_Position += m_Offset;
         }
     }
 

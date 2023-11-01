@@ -249,7 +249,7 @@ public class PlayerStateMachine : MonoBehaviour
     private void SetInteraction()
     {
         m_TargetRay = m_MainCamera.ScreenPointToRay(Input.mousePosition);
-        if (Input.GetMouseButtonDown(1)) // MOVE
+        if (Input.GetMouseButton(1)) // MOVE
         {
             if (Physics.Raycast(m_TargetRay, out m_TargetHit, Mathf.Infinity, 1 << 8))
             {
@@ -271,7 +271,7 @@ public class PlayerStateMachine : MonoBehaviour
                     m_Destination = m_TargetCrystal.transform.position;
                     SetState(new PlayerMoving(this));
                 }
-                else if (m_TargetHit.collider.gameObject.layer == 12)
+                else if (m_TargetHit.collider.gameObject.CompareTag("CaveMan"))
                 {
                     if (!m_BlueSpell) unlockSpell("Blue");
                     LevelManager.instance.LevelUp();

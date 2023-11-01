@@ -23,6 +23,7 @@ TagManager:
   - Blue_Spear
   - Yellow_Hammer
   - Red_Arrow
+  - CaveMan
   layers:
   - Default
   - TransparentFX
@@ -34,13 +35,13 @@ TagManager:
   - Enemy
   - Ground
   - CrystalParts
-  - Env
+  - IceEnv
   - Shield
   - Caveman
-  - 
-  - 
-  - 
-  - 
+  - nopost
+  - EarthEnv
+  - LavaEnv
+  - DesertEnv
   - 
   - 
   - 
