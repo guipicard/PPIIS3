@@ -21,8 +21,6 @@ public class VfxPool : MonoBehaviour
     public Dictionary<VfxClip, List<GameObject>> VfxDictionary;
     private List<AudioSource> activeSources;
 
-
-
     private AudioPool audioPool;
 
     private void Awake()

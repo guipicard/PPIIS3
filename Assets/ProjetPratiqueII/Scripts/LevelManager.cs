@@ -3,6 +3,7 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class LevelManager : MonoBehaviour
 {
@@ -69,9 +70,12 @@ public class LevelManager : MonoBehaviour
 
     private int m_Steps;
 
-    private Camera m_MainCamera;
+    public Camera m_MainCamera;
 
     private List<CrystalsBehaviour> m_CrystalController;
+
+    public GameObject m_Player;
+    public GameObject m_PlayerHealthBar;
 
     public static LevelManager instance
     {
@@ -97,6 +101,7 @@ public class LevelManager : MonoBehaviour
 
     private void Awake()
     {
+        LoadLevel();
     }
 
     void Start()
@@ -105,46 +110,58 @@ public class LevelManager : MonoBehaviour
 
     public void LoadLevel()
     {
-        m_CrystalController = GameObject.FindObjectsOfType<CrystalsBehaviour>().ToList();
-        m_Steps = 0;
+        m_Pools = FindObjectOfType<ObjPool>();
         m_MainCamera = Camera.main;
-        inSequence = false;
-        takeInput = true;
-        currentWorld = Worlds[0].name;
-        m_Pools = GameObject.FindObjectOfType<ObjPool>();
-        if (!m_Pools) return;
-        playerDamage = 20.0f;
-        CollectAction += CollectCrystal;
-
-        m_BlueSpellAvailable = false;
-        m_YellowSpellAvailable = false;
-        m_GreenSpellAvailable = false;
-        m_RedSpellAvailable = false;
-
-        m_BlueSpellUnlocked = false;
-        m_YellowSpellUnlocked = false;
-        m_GreenSpellUnlocked = false;
-        m_RedSpellUnlocked = false;
-
-        m_GreenCollected = 0;
-        m_RedCollected = 0;
-        m_YellowCollected = 0;
-        m_BlueCollected = 0;
-        playerGodmode = false;
-        WorldObjects = new Dictionary<string, GameObject>();
-        WorldObjectNames = new List<string>();
-        WorldObjectNames.Add("IceEnv");
-        WorldObjectNames.Add("EarthEnv");
-        WorldObjectNames.Add("LavaEnv");
-        WorldObjectNames.Add("DesertEnv");
-        for (int i = 0; i < Worlds.Count; i++)
+        m_Player = GameObject.Find("Player");
+        m_PlayerHealthBar = GameObject.Find("PlayerCanvas");
+        if (SceneManager.GetActiveScene().name != "MainMenu")
         {
-            GameObject obj = GameObject.Find(WorldObjectNames[i]);
-            WorldObjects.Add(Worlds[i].name, obj);
-            bool active = i == 0;
-            obj.SetActive(active);
+            m_CrystalController = FindObjectsOfType<CrystalsBehaviour>().ToList();
+            currentWorld = Worlds[0].name;
+            WorldObjectNames.Add("IceEnv");
+            WorldObjectNames.Add("EarthEnv");
+            WorldObjectNames.Add("LavaEnv");
+            WorldObjectNames.Add("DesertEnv");
+            for (int i = 0; i < Worlds.Count; i++)
+            {
+                GameObject obj = GameObject.Find(WorldObjectNames[i]);
+                WorldObjects.Add(Worlds[i].name, obj);
+                bool active = i == 0;
+                obj.SetActive(active);
+            }
+            AudioManager.instance.PlayMusic(MusicClip.Ice, 1.0f);
+            m_PlayerHealthBar.SetActive(true);
+            takeInput = true;
+            m_Player.GetComponent<PlayerStateMachine>().TeleportSpawn(Worlds[0]);
         }
-        AudioManager.instance.PlayMusic(MusicClip.Ice, 1.0f);
+        else
+        {
+            playerGodmode = false;
+            WorldObjects = new Dictionary<string, GameObject>();
+            WorldObjectNames = new List<string>();
+            CollectAction += CollectCrystal;
+            m_Steps = 0;
+            inSequence = false;
+            takeInput = false;
+
+
+            playerDamage = 20.0f;
+
+            m_GreenCollected = 0;
+            m_RedCollected = 0;
+            m_YellowCollected = 0;
+            m_BlueCollected = 0;
+            m_BlueSpellAvailable = false;
+            m_YellowSpellAvailable = false;
+            m_GreenSpellAvailable = false;
+            m_RedSpellAvailable = false;
+
+            m_BlueSpellUnlocked = false;
+            m_YellowSpellUnlocked = false;
+            m_GreenSpellUnlocked = false;
+            m_RedSpellUnlocked = false;
+            m_PlayerHealthBar.SetActive(false);
+        }
     }
 
     public GameObject SpawnObj(string _tag, Vector3 _position, Quaternion _rotation)

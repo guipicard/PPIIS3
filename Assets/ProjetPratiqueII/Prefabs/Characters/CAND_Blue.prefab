@@ -3658,8 +3658,9 @@ MonoBehaviour:
   m_DamageTag: PlayerBullet
   m_BulletTag: Blue_Spear
   m_TriggerDistance: 12
-  m_attackDistance: 4
+  m_attackDistance: 6
   m_AiCanvas: {fileID: 4563300416630836711}
+  m_PlayerCanvas: {fileID: 0}
   m_HealthBar: {fileID: 925267454076704477}
   m_Cooldown: 2
   m_Hp: 100

@@ -21,17 +21,17 @@ public class ObjPool : MonoBehaviour
 
     void Awake()
     {
-        // Init();
-        SceneManager.sceneLoaded += Init;
+        Init();
+        //SceneManager.sceneLoaded += Init;
     }
     
     private void OnDestroy()
     {
-        SceneManager.sceneLoaded -= Init;
+        //SceneManager.sceneLoaded -= Init;
     }
 
 
-    public void Init(Scene scene, LoadSceneMode mode)
+    public void Init()
     {
         
         PoolsDictionary = new Dictionary<string, List<GameObject>>();
@@ -47,7 +47,6 @@ public class ObjPool : MonoBehaviour
             PoolsDictionary.Add(pool.tag, newList);
             
         }
-        LevelManager.instance.LoadLevel();
     }
 
     public GameObject GetObj(string listName)

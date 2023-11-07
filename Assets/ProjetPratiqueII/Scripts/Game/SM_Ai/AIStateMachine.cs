@@ -67,7 +67,7 @@ public class AIStateMachine : MonoBehaviour
         targetLost = false;
         m_CooldownElapsed = 0.0f;
         m_Hp = m_MaxHp;
-        player = GameObject.Find("Player");
+        player = LevelManager.instance.m_Player;
         m_PlayerCanvas = player.GetComponent<PlayerStateMachine>().m_PlayerCanvas.transform;
         m_Rigidbody = GetComponent<Rigidbody>();
         m_NavmeshAgent = GetComponent<NavMeshAgent>();
@@ -76,7 +76,7 @@ public class AIStateMachine : MonoBehaviour
         m_IsStabbing = false;
         m_OutOfRange = true;
         m_HealthBar.value = m_Hp / 100;
-        m_MainCamera = Camera.main;
+        m_MainCamera = LevelManager.instance.m_MainCamera;
         m_OutlineScript = GetComponent<Outline>();
         m_OutlineScript.enabled = false;
         m_Dead = false;
@@ -96,6 +96,7 @@ public class AIStateMachine : MonoBehaviour
     
     void Update()
     {
+        if (!m_MainCamera) m_MainCamera = Camera.main;
         if (targetLost)
         {
             lostElapsed += Time.deltaTime;

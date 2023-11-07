@@ -107,9 +107,6 @@ public class PlayerStateMachine : MonoBehaviour
 
     private bool m_YellowSpellActive;
 
-    [SerializeField] private GameObject HealingVFX;
-    private float m_HealingVFXElapsed;
-
     private string m_CurrentSun;
     [SerializeField] private List<string> m_Colors;
     [SerializeField] private List<GameObject> m_SunsObj;
@@ -137,7 +134,7 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void Init()
     {
-        m_MainCamera = Camera.main;
+        m_MainCamera = LevelManager.instance.m_MainCamera;
         m_FullHpElapsed = 0.0f;
         m_Suns = new Dictionary<string, GameObject>();
         for (int i = 0; i < m_SunsObj.Count; i++)
@@ -146,12 +143,12 @@ public class PlayerStateMachine : MonoBehaviour
         }
 
         m_CurrentSun = "";
-        m_HealingVFXElapsed = 0.0f;
         m_BlueSpellCost = LevelManager.instance.m_BlueSpellCost;
         m_GreenSpellCost = LevelManager.instance.m_GreenSpellCost;
         m_RedSpellCost = LevelManager.instance.m_RedSpellCost;
         m_YellowSpellCost = LevelManager.instance.m_YellowSpellCost;
         unlockPrice = LevelManager.instance.m_UnlockPrice;
+        m_AimSphere = GameObject.Find("Magic shield loop yellow");
         m_AimSphere.SetActive(false);
         m_AimingYellow = false;
         m_AimingRed = false;
@@ -193,6 +190,7 @@ public class PlayerStateMachine : MonoBehaviour
 
     void Update()
     {
+        if (!m_MainCamera) m_MainCamera = Camera.main;
         if (LevelManager.instance.takeInput)
         {
             SpellTimers();
@@ -476,7 +474,6 @@ public class PlayerStateMachine : MonoBehaviour
         LevelManager.instance.CollectAction?.Invoke(-m_GreenSpellCost, "Green");
         LevelManager.instance.SpellCastAction?.Invoke("Green");
         LevelManager.instance.SetSpellAvailable("Green", false);
-        m_HealingVFXElapsed = 0.0f;
         var position = transform.position;
         VfxManager.instance.PlayVfx(VfxClip.Heal, position);
         AudioManager.instance.PlaySound(SoundClip.Heal, 1f, position);
@@ -684,6 +681,14 @@ public class PlayerStateMachine : MonoBehaviour
         {
             Cursor.SetCursor(m_AttackCursor, Vector2.zero, CursorMode.Auto);
         }
+    }
+
+    public void TeleportSpawn(Biome _biome)
+    {
+        m_TargetCrystal = null;
+        m_StoppingDistance = 0;
+        transform.position = _biome.entrancePosition;
+        transform.eulerAngles = _biome.entranceRotation;
     }
 
     private void TeleportNextAnim(Biome _biome)

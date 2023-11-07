@@ -5,7 +5,7 @@ using UnityEngine;
 
 public class CameraFollow : MonoBehaviour
 {
-    [SerializeField] private Transform m_Player;
+    private Transform m_Player;
     [SerializeField] private Vector3 m_Offset;
     [SerializeField] private float m_Speed;
 
@@ -14,6 +14,8 @@ public class CameraFollow : MonoBehaviour
 
     void Start()
     {
+        LevelManager.instance.LoadLevel();
+        m_Player = GameObject.Find("Player").transform;
         m_Position = m_Player.position + new Vector3(0, 1, 0) - m_Offset;
         // m_Position.y = m_PosY - m_Offset.y;
         transform.position = m_Position;
