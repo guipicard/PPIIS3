@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 public class LevelManager : MonoBehaviour
@@ -70,6 +71,8 @@ public class LevelManager : MonoBehaviour
 
     private Camera m_MainCamera;
 
+    private List<CrystalsBehaviour> m_CrystalController;
+
     public static LevelManager instance
     {
         get
@@ -102,6 +105,7 @@ public class LevelManager : MonoBehaviour
 
     public void LoadLevel()
     {
+        m_CrystalController = GameObject.FindObjectsOfType<CrystalsBehaviour>().ToList();
         m_Steps = 0;
         m_MainCamera = Camera.main;
         inSequence = false;
@@ -140,7 +144,7 @@ public class LevelManager : MonoBehaviour
             bool active = i == 0;
             obj.SetActive(active);
         }
-        // AudioManager.instance.PlayMusic(MusicClip.Ice, 1.0f); 
+        AudioManager.instance.PlayMusic(MusicClip.Ice, 1.0f);
     }
 
     public GameObject SpawnObj(string _tag, Vector3 _position, Quaternion _rotation)
@@ -304,7 +308,7 @@ public class LevelManager : MonoBehaviour
 
     public void GoNextBiome()
     {
-        // AudioManager.instance.StopMusic();
+        AudioManager.instance.StopMusic();
         inSequence = true;
         int biomeIndex = GetBiomeIndex();
         string nextBiomeName = Worlds[biomeIndex + 1].name;
@@ -315,12 +319,12 @@ public class LevelManager : MonoBehaviour
                                           m_MainCamera.GetComponent<CameraFollow>().GetOffset();
         WorldObjects[currentWorld].SetActive(false);
         currentWorld = Worlds[biomeIndex + 1].name;
-        // AudioManager.instance.PlayMusic((MusicClip)biomeIndex + 1, 1.0f);
+        AudioManager.instance.PlayMusic((MusicClip)biomeIndex + 1, 1.0f);
     }
 
     public void GoLastBiome()
     {
-        // AudioManager.instance.StopMusic();
+        AudioManager.instance.StopMusic();
         inSequence = true;
         int biomeIndex = GetBiomeIndex();
         string nextBiomeName = Worlds[biomeIndex - 1].name;
@@ -331,7 +335,7 @@ public class LevelManager : MonoBehaviour
                                           m_MainCamera.GetComponent<CameraFollow>().GetOffset();
         WorldObjects[currentWorld].SetActive(false);
         currentWorld = Worlds[biomeIndex - 1].name;
-        // AudioManager.instance.PlayMusic((MusicClip)biomeIndex - 1, 1.0f);
+        AudioManager.instance.PlayMusic((MusicClip)biomeIndex - 1, 1.0f);
     }
 
     public void UnlockBiome()
@@ -376,7 +380,6 @@ public class LevelManager : MonoBehaviour
             if (m_BlueCollected >= 300)
             {
                 CollectAction?.Invoke(-300, "Blue");
-                SpellUnlockAction("Green");
                 Blockades[0].SetActive(false);
                 m_Steps++;
             }
@@ -387,7 +390,7 @@ public class LevelManager : MonoBehaviour
             {
                 m_GreenSpellUnlocked = true;
                 CollectAction?.Invoke(-300, "Green");
-                SpellUnlockAction("Red");
+                SpellUnlockAction("Green");
                 Blockades[1].SetActive(false);
                 m_Steps++;
             }
@@ -398,7 +401,7 @@ public class LevelManager : MonoBehaviour
             {
                 m_RedSpellUnlocked = true;
                 CollectAction?.Invoke(-300, "Red");
-                SpellUnlockAction("Yellow");
+                SpellUnlockAction("Red");
                 Blockades[2].SetActive(false);
                 m_Steps++;
             }
@@ -409,9 +412,26 @@ public class LevelManager : MonoBehaviour
             {
                 m_YellowSpellUnlocked = true;
                 CollectAction?.Invoke(-300, "Yellow");
+                SpellUnlockAction("Yellow");
                 Blockades[3].SetActive(false);
                 m_Steps++;
             }
+        }
+    }
+
+    public void ToggleManuel()
+    {
+        foreach (var controller in m_CrystalController)
+        {
+            controller.ToggleManuel();
+        }
+    }
+    
+    public void DuplicateCrystals()
+    {
+        foreach (var controller in m_CrystalController)
+        {
+            controller.CrystalDuplicationLoop();
         }
     }
 }

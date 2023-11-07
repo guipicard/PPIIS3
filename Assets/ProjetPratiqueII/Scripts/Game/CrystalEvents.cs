@@ -9,13 +9,11 @@ public class CrystalEvents : MonoBehaviour
     [SerializeField] private string m_PartsTag;
     [SerializeField] private Vector3 m_InitialPosition;
     private bool m_CanGetDestroyed;
-    private CrystalsBehaviour m_CrystalsBehaviour;
     private Outline m_OutlineScript;
     public string m_Biome;
     
     void Start()
     {
-        m_CrystalsBehaviour = transform.parent.GetComponent<CrystalsBehaviour>();
         m_CanGetDestroyed = Vector3.Distance(transform.position, m_InitialPosition) > 9.0f;
         m_Biome = LevelManager.instance.currentWorld;
     }
@@ -33,9 +31,12 @@ public class CrystalEvents : MonoBehaviour
 
     public void GetMined()
     {
-        LevelManager.instance.SpawnObj(m_PartsTag, transform.position, Quaternion.identity);
+        var position = transform.position;
+        LevelManager.instance.SpawnObj(m_PartsTag, position, Quaternion.identity);
         LevelManager.instance.ToggleInactive(gameObject);
         LevelManager.instance.UpdateCrystalNums(m_CrystalTag);
+        AudioManager.instance.PlaySound(SoundClip.CrystalExplosion, 1f, position);
+        VfxManager.instance.PlayVfx(VfxClip.CrystalMine, position);
     }
 
     public bool GetCanDestroy()

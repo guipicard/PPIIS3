@@ -35,8 +35,6 @@ public class PlayerStateMachine : MonoBehaviour
 
     [SerializeField] public string m_DamageTag;
     [SerializeField] public Slider m_HealthBar;
-    [SerializeField] public Vector3 m_HealthBarOffset;
-
     [SerializeField] public Canvas m_PlayerCanvas;
     [SerializeField] public GameObject m_AimSphere;
 
@@ -86,8 +84,6 @@ public class PlayerStateMachine : MonoBehaviour
     [HideInInspector] public bool m_AimingYellow;
     [SerializeField] public Vector3 m_AimOffset;
     [SerializeField] public GameObject m_Lightning;
-    [SerializeField] public GameObject m_LightningRight;
-    [SerializeField] public GameObject m_LightningLeft;
     private int m_BlueSpellCost;
     private int m_GreenSpellCost;
     private int m_RedSpellCost;
@@ -112,13 +108,13 @@ public class PlayerStateMachine : MonoBehaviour
     private bool m_YellowSpellActive;
 
     [SerializeField] private GameObject HealingVFX;
-    private GameObject HealingVFXObj;
     private float m_HealingVFXElapsed;
 
     private string m_CurrentSun;
     [SerializeField] private List<string> m_Colors;
     [SerializeField] private List<GameObject> m_SunsObj;
     private Dictionary<string, GameObject> m_Suns;
+
 
     struct CrystalWave
     {
@@ -141,6 +137,7 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void Init()
     {
+        m_MainCamera = Camera.main;
         m_FullHpElapsed = 0.0f;
         m_Suns = new Dictionary<string, GameObject>();
         for (int i = 0; i < m_SunsObj.Count; i++)
@@ -150,8 +147,6 @@ public class PlayerStateMachine : MonoBehaviour
 
         m_CurrentSun = "";
         m_HealingVFXElapsed = 0.0f;
-        HealingVFXObj = Instantiate(HealingVFX, transform);
-        HealingVFXObj.SetActive(false);
         m_BlueSpellCost = LevelManager.instance.m_BlueSpellCost;
         m_GreenSpellCost = LevelManager.instance.m_GreenSpellCost;
         m_RedSpellCost = LevelManager.instance.m_RedSpellCost;
@@ -198,11 +193,6 @@ public class PlayerStateMachine : MonoBehaviour
 
     void Update()
     {
-        if (m_MainCamera == null)
-        {
-            m_MainCamera = Camera.main;
-            m_PlayerCanvas.transform.LookAt(m_MainCamera.transform.position);
-        }
         if (LevelManager.instance.takeInput)
         {
             SpellTimers();
@@ -210,16 +200,6 @@ public class PlayerStateMachine : MonoBehaviour
             SetInteraction();
         }
 
-        if (HealingVFXObj.activeSelf)
-        {
-            m_HealingVFXElapsed += Time.deltaTime;
-            HealingVFXObj.transform.position = transform.position;
-            if (m_HealingVFXElapsed > HealingVFX.GetComponent<ParticleSystem>().main.duration)
-            {
-                HealingVFXObj.SetActive(false);
-            }
-        }
-        
         if (m_Hp == m_HealthCapacity)
         {
             m_FullHpElapsed += Time.deltaTime;
@@ -312,6 +292,7 @@ public class PlayerStateMachine : MonoBehaviour
         Quaternion bsRotation = m_BulletSpawner.rotation;
         GameObject bullet = LevelManager.instance.SpawnObj("Player_Bullet", bsPos, bsRotation);
         bullet.GetComponent<PlayerBullet>().SetTarget(m_TargetEnemy, bsPos, m_Transform);
+        AudioManager.instance.PlaySound(SoundClip.BlueSpellLaunch, 1.0f, bsPos);
     }
 
     private void UpdateHealthBar()
@@ -331,7 +312,7 @@ public class PlayerStateMachine : MonoBehaviour
 
             UpdateHealthBar();
             m_RegenerateElapsed = m_RegenerateTimer;
-            
+
             Image sprite1 = m_HealthBar.transform.GetChild(0).GetComponent<Image>();
             Image sprite2 = m_HealthBar.transform.GetChild(1).GetChild(0).GetComponent<Image>();
             Color color1 = sprite1.color;
@@ -457,25 +438,26 @@ public class PlayerStateMachine : MonoBehaviour
 
     private void unlockSpell(string _color)
     {
+        var position = transform.position;
+        VfxManager.instance.PlayVfx(VfxClip.Buff, position);
+        AudioManager.instance.PlaySound(SoundClip.Buff, 1f, position);
         switch (_color)
         {
             case "Blue":
-                ChangeSun(_color);
                 m_BlueSpell = true;
+                ChangeSun(_color);
                 break;
             case "Green":
                 m_GreenSpell = true;
                 m_RegenerateAmount = m_MaxRegenerateAmount;
                 break;
-            case "Yellow":
-                m_YellowSpell = true;
-                LevelManager.instance.SetPlayerDamage(m_MaxDamage);
-
-                break;
             case "Red":
                 m_RedSpell = true;
                 m_HealthCapacity = m_MaxHealth;
-                m_Hp += 50.0f;
+                break;
+            case "Yellow":
+                m_YellowSpell = true;
+                LevelManager.instance.SetPlayerDamage(m_MaxDamage);
                 break;
         }
     }
@@ -491,14 +473,14 @@ public class PlayerStateMachine : MonoBehaviour
     private void GreenSpell()
     {
         ChangeSun("Green");
-        m_HealingVFXElapsed = 0.0f;
-        HealingVFXObj.SetActive(true);
-        AudioSource audioSource = HealingVFXObj.GetComponent<AudioSource>();
-        audioSource.PlayOneShot(audioSource.clip);
-        Heal(m_HealAmount);
         LevelManager.instance.CollectAction?.Invoke(-m_GreenSpellCost, "Green");
         LevelManager.instance.SpellCastAction?.Invoke("Green");
         LevelManager.instance.SetSpellAvailable("Green", false);
+        m_HealingVFXElapsed = 0.0f;
+        var position = transform.position;
+        VfxManager.instance.PlayVfx(VfxClip.Heal, position);
+        AudioManager.instance.PlaySound(SoundClip.Heal, 1f, position);
+        Heal(m_HealAmount);
     }
 
     private void RedSpell()
@@ -508,6 +490,7 @@ public class PlayerStateMachine : MonoBehaviour
         LevelManager.instance.RedSpellAction?.Invoke(m_RedSpellDamage);
         LevelManager.instance.SpellCastAction?.Invoke("Red");
         LevelManager.instance.SetSpellAvailable("Red", false);
+        VfxManager.instance.PlayVfx(VfxClip.RedSpell, m_AimSphere.transform.position);
         m_AimSphere.SetActive(false);
     }
 
@@ -603,10 +586,10 @@ public class PlayerStateMachine : MonoBehaviour
                     lightningLeft.position = crystalObj.transform.position;
                     lightningRight.position = destination.transform.position;
                     lightningLeft.LookAt(lightningRight.position);
-                    
+
                     HS_FrontAttack lightningScript = lightningLeft.gameObject.GetComponent<HS_FrontAttack>();
                     lightningScript.playMeshEffect = true;
-                    
+
                     GameObject blueBall = Instantiate(m_BlueBall);
                     BlueBallBehaviour ballScript = blueBall.GetComponent<BlueBallBehaviour>();
                     ballScript.SetInitialPos(crystalObj.transform.position);
@@ -740,5 +723,13 @@ public class PlayerStateMachine : MonoBehaviour
         if (m_CurrentSun != "") m_Suns[m_CurrentSun].SetActive(false);
         m_Suns[_color].SetActive(true);
         m_CurrentSun = _color;
+    }
+
+    public void Footstep()
+    {
+        if (LevelManager.instance.currentWorld == "Ice")
+        {
+            AudioManager.instance.PlaySnowStep(transform.position);
+        }
     }
 }

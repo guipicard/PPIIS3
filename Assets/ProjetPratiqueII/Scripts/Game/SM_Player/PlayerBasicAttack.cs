@@ -5,8 +5,10 @@ using UnityEngine;
 public class PlayerBasicAttack : PlayerState
 {
     private float m_Elapsed;
+    private Quaternion m_BulletRotation;
     public PlayerBasicAttack(PlayerStateMachine stateMachine) : base(stateMachine)
     {
+        m_BulletRotation = new Quaternion();
         m_RigidBody.velocity = Vector3.zero;
         m_Animator.SetBool(Running, false);
         m_Elapsed = 0.0f;

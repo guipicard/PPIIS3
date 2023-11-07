@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4460411924239504}
   - component: {fileID: 198275122312541406}
   - component: {fileID: 199643879200968062}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: MagicRunes1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4909,7 +4909,7 @@ GameObject:
   - component: {fileID: 4807588593646154}
   - component: {fileID: 198875019397243490}
   - component: {fileID: 199134684545671888}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: MagicRunes3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -9807,7 +9807,7 @@ GameObject:
   - component: {fileID: 4761305977352956}
   - component: {fileID: 198930684664807304}
   - component: {fileID: 199654014035831592}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Aura
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14705,7 +14705,7 @@ GameObject:
   - component: {fileID: 4724598192765296}
   - component: {fileID: 198897183197986068}
   - component: {fileID: 199301138803835214}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Flares
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19612,7 +19612,7 @@ GameObject:
   - component: {fileID: 4420907987457534}
   - component: {fileID: 198350602813069074}
   - component: {fileID: 199310768557356820}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: MagicText
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24510,7 +24510,7 @@ GameObject:
   - component: {fileID: 4481150514027386}
   - component: {fileID: 198367875986122788}
   - component: {fileID: 199272061206685132}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: MagicRunes4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29408,7 +29408,7 @@ GameObject:
   - component: {fileID: 4853598316023866}
   - component: {fileID: 198599432606176542}
   - component: {fileID: 199286575099582732}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: MagicRunes2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34306,7 +34306,7 @@ GameObject:
   - component: {fileID: 4607238438177876}
   - component: {fileID: 198380700938656722}
   - component: {fileID: 199168618000532714}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Magic shield loop yellow
   m_TagString: Untagged
   m_Icon: {fileID: 0}

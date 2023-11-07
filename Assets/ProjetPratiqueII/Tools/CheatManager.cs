@@ -20,6 +20,7 @@ public class CheatManager : MonoBehaviour
 
     private bool godMode;
     private bool maxDamage;
+    private bool manuelControl;
 
 
     private static CheatManager m_UniqueInstance;
@@ -47,7 +48,7 @@ public class CheatManager : MonoBehaviour
     {
         godMode = false;
         maxDamage = false;
-
+        manuelControl = false;
         showWindow = false;
         showCrystalState = false;
         showCheatsState = false;
@@ -126,7 +127,7 @@ public class CheatManager : MonoBehaviour
                 Player.GetComponent<PlayerStateMachine>().Heal(100);
             }
 
-            maxDamage = GUILayout.Toggle(maxDamage, "One Shot Ennemies");
+            maxDamage = GUILayout.Toggle(maxDamage, "One Shot Enemies");
             if (maxDamage)
             {
                 LevelManager.instance.SetPlayerDamage(100);
@@ -136,12 +137,27 @@ public class CheatManager : MonoBehaviour
                 LevelManager.instance.SetPlayerDamage(Player.GetComponent<PlayerStateMachine>().m_MaxDamage);
             }
 
-            if (GUILayout.Button("Give Crystals"))
+            if (GUILayout.RepeatButton("Give Crystals"))
             {
                 LevelManager.instance.CollectAction?.Invoke(100, "Green");
                 LevelManager.instance.CollectAction?.Invoke(100, "Red");
                 LevelManager.instance.CollectAction?.Invoke(100, "Yellow");
                 LevelManager.instance.CollectAction?.Invoke(100, "Blue");
+            }
+
+            string manuelString = manuelControl ? "Manuel Crystals: Y" : "Manuel Crystals: N";
+            if (GUILayout.Button(manuelString))
+            {
+                manuelControl = !manuelControl;
+                LevelManager.instance.ToggleManuel();
+            }
+
+            if (manuelControl)
+            {
+                if (GUILayout.Button("Duplicate"))
+                {
+                    LevelManager.instance.DuplicateCrystals();
+                }
             }
         }
     }

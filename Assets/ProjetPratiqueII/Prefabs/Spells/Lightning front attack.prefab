@@ -11,7 +11,7 @@ GameObject:
   - component: {fileID: 4749331170043372}
   - component: {fileID: 198088463151713250}
   - component: {fileID: 199293627133594496}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: ShineLightning
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -4909,7 +4909,7 @@ GameObject:
   - component: {fileID: 4126089413080438}
   - component: {fileID: 198826681275476534}
   - component: {fileID: 199912214834155288}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Flare
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -10032,7 +10032,7 @@ GameObject:
   - component: {fileID: 4582360384681022}
   - component: {fileID: 198655928289189578}
   - component: {fileID: 199005577618539072}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Darkness
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -14931,7 +14931,7 @@ GameObject:
   - component: {fileID: 198194849292324630}
   - component: {fileID: 199707815524514182}
   - component: {fileID: 114017366596268754}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Lightning orb right
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -19861,7 +19861,7 @@ GameObject:
   - component: {fileID: 4947350102470540}
   - component: {fileID: 198626153111276950}
   - component: {fileID: 199982206133474118}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Darkness
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -24760,7 +24760,7 @@ GameObject:
   - component: {fileID: 198583914396258316}
   - component: {fileID: 199668506097493076}
   - component: {fileID: 114934106235487156}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Lightning orb left
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -29691,7 +29691,7 @@ GameObject:
   - component: {fileID: 4783708530404610}
   - component: {fileID: 198140310479442936}
   - component: {fileID: 199045259473834470}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: ShineLightning
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -34589,7 +34589,7 @@ GameObject:
   - component: {fileID: 4851464629747558}
   - component: {fileID: 198864486848081630}
   - component: {fileID: 199385473451095662}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Lightning middle
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39504,7 +39504,7 @@ GameObject:
   m_Component:
   - component: {fileID: 4933357992990290}
   - component: {fileID: 82027249231261780}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Lightning front attack
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -39653,7 +39653,7 @@ GameObject:
   - component: {fileID: 4196998302432194}
   - component: {fileID: 198824809887744560}
   - component: {fileID: 199940868144095216}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Darkness
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44551,7 +44551,7 @@ GameObject:
   - component: {fileID: 4479995520147278}
   - component: {fileID: 198015372242455926}
   - component: {fileID: 199912603277408540}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Electro orb2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -49449,7 +49449,7 @@ GameObject:
   - component: {fileID: 4656501568599732}
   - component: {fileID: 198355023912950912}
   - component: {fileID: 199058529693353612}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Electro orb2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -54347,7 +54347,7 @@ GameObject:
   - component: {fileID: 4157377141644790}
   - component: {fileID: 198216860814694320}
   - component: {fileID: 199266672219112636}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Flare
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -59470,7 +59470,7 @@ GameObject:
   - component: {fileID: 4134188005539774}
   - component: {fileID: 198122440980794268}
   - component: {fileID: 199624714886498258}
-  m_Layer: 0
+  m_Layer: 13
   m_Name: Darkness
   m_TagString: Untagged
   m_Icon: {fileID: 0}

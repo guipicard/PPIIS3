@@ -60,7 +60,7 @@ Material:
     - _QueueOffset: 0
     m_Colors:
     - Vector2_98d6ca0f7035438089d044e60ce4fced: {r: -1, g: 0, b: 0, a: 0}
-    - _Clolor01: {r: 0.0058084256, g: 0, b: 0.3584906, a: 0}
-    - _Clolor02: {r: 0.21295011, g: 0, b: 0.32156864, a: 0}
+    - _Clolor01: {r: 0.14127357, g: 0, b: 0.6117647, a: 0}
+    - _Clolor02: {r: 0.27450982, g: 0, b: 0.2626336, a: 0}
     - _MainTexSpeed: {r: -0.5, g: 0, b: 0, a: 0}
   m_BuildTextureStacks: []

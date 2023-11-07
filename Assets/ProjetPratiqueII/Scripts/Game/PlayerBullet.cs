@@ -50,11 +50,11 @@ public class PlayerBullet : MonoBehaviour
 
     private void OnEnable()
     {
+        GetComponent<ParticleSystem>().Play();
+        transform.GetChild(0).GetComponent<TrailRenderer>().Clear();
+        transform.GetChild(0).GetChild(0).GetComponent<TrailRenderer>().Clear();
         m_Elapsed = 0.0f;
         targetAlive = true;
-        transform.GetChild(0).GetComponent<TrailRenderer>().Clear();
-        // transform.GetChild(0).GetChild(0).GetComponent<TrailRenderer>().Clear();
-        
     }
 
     void Update()
@@ -71,10 +71,6 @@ public class PlayerBullet : MonoBehaviour
         }
         else
         {
-            //
-            // Vector3 playerOffset = m_PlayerTransform.position - m_PlayerInitialPos;
-            // transform.gameObject.GetComponent<Rigidbody>().position = m_InitialPosition + playerOffset;
-            
             Vector3 initial = playerVelocity.normalized + m_InitialVelocity * m_Speed;
             Vector3 target = playerVelocity.normalized + m_TargetVelocity * m_Speed;
             m_Rigidbody.velocity = Vector3.Lerp( initial, target, m_Elapsed / m_StepTwoTime);
@@ -97,6 +93,8 @@ public class PlayerBullet : MonoBehaviour
             if (targetAlive)
             {
                 AIStateMachine aiSM = m_Target.GetComponent<AIStateMachine>();
+                AudioManager.instance.PlaySound(SoundClip.BlueSpellHit,  1f, transform.position);
+                VfxManager.instance.PlayVfx(VfxClip.ToonPunch, transform.position);
                 aiSM.TakeDamage(LevelManager.instance.playerDamage);
                 if (aiSM.IsDead())
                 {
@@ -105,6 +103,7 @@ public class PlayerBullet : MonoBehaviour
                 }
             }
             LevelManager.instance.ToggleInactive(gameObject);
+            m_Rigidbody.velocity = Vector3.zero;
         }
 
         Transform sparks = transform.GetChild(1);

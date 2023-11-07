@@ -119,7 +119,7 @@ public class AIStateMachine : MonoBehaviour
         m_AiCanvas.transform.rotation = m_PlayerCanvas.rotation;
     }
     
-    public Outline GetOutlineComponent()
+    private Outline GetOutlineComponent()
     {
         return m_OutlineScript;
     }
@@ -151,6 +151,7 @@ public class AIStateMachine : MonoBehaviour
         if (other.gameObject.CompareTag("AOE"))
         {
             LevelManager.instance.RedSpellAction += TakeDamage;
+            m_OutlineScript.enabled = true;
         }
     }
     
@@ -159,6 +160,7 @@ public class AIStateMachine : MonoBehaviour
         if (other.gameObject.CompareTag("AOE"))
         {
             LevelManager.instance.RedSpellAction -= TakeDamage;
+            m_OutlineScript.enabled = false;
         }
     }
 

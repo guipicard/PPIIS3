@@ -29,7 +29,7 @@ public class HS_EffectSound : MonoBehaviour
         }
     }
 
-    void RepeatSound()
+    public void RepeatSound()
     {
         soundComponent.PlayOneShot(clip);
     }

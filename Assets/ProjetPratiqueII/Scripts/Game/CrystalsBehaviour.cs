@@ -25,9 +25,12 @@ public class CrystalsBehaviour : MonoBehaviour
     private float m_CrystalHeight;
     private float CrystalSpacing;
     private Vector2[] m_SurroundOffsets;
-    
+
+    private bool m_ManuelControl;
+
     void Start()
     {
+        m_ManuelControl = false;
         m_InitialPositions = new List<Vector3>();
         Transform spawnTransform = transform.Find("Spawners");
         int count = spawnTransform.childCount;
@@ -61,20 +64,20 @@ public class CrystalsBehaviour : MonoBehaviour
         {
             m_LastCrystalWave.Add(pos);
         }
-
-        SpawnAi();
     }
 
     void Update()
     {
-        CrystalDuplicationLoop();
+        if (!m_ManuelControl) m_Elapsed += Time.deltaTime;
+        if (m_Elapsed > LevelManager.instance.m_CrystalSpawnTimer)
+        {
+            CrystalDuplicationLoop();
+        }
     }
 
-    private void CrystalDuplicationLoop()
+    public void CrystalDuplicationLoop()
     {
-        m_Elapsed += Time.deltaTime;
-        
-        if (m_Elapsed > LevelManager.instance.m_CrystalSpawnTimer && m_Biome == LevelManager.instance.currentWorld)
+        if (m_Biome == LevelManager.instance.currentWorld)
         {
             m_AiActive = GetAiCount();
             m_CrystalActive = LevelManager.instance.UpdateCrystalNums(m_CrystalTag);
@@ -86,7 +89,6 @@ public class CrystalsBehaviour : MonoBehaviour
             {
                 SpawnAi();
             }
-
 
             // Reset Lists
             m_PotentialPosition.Clear();
@@ -210,5 +212,10 @@ public class CrystalsBehaviour : MonoBehaviour
         }
 
         return result;
+    }
+
+    public void ToggleManuel()
+    {
+        m_ManuelControl = !m_ManuelControl;
     }
 }
